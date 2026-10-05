@@ -1,0 +1,1638 @@
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PR Psicologia — Jessica Garnier</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --clr-bg:            #f7f5ff;
+      --clr-surface:       #ffffff;
+      --clr-primary:       #7c3aed;
+      --clr-primary-hover: #6d28d9;
+      --clr-primary-light: #ede9fe;
+      --clr-text:          #1e1b2e;
+      --clr-muted:         #6b7280;
+      --clr-border:        #ddd6fe;
+      --clr-error:         #dc2626;
+      --radius:            14px;
+      --shadow:            0 4px 24px rgba(124,58,237,.12);
+    }
+
+    html, body {
+      min-height: 100%;
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      background: var(--clr-bg);
+      color: var(--clr-text);
+      line-height: 1.6;
+    }
+
+    /* ══════════════════════════════
+       PARTICIPANT VIEW
+    ══════════════════════════════ */
+    #participant-view {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 24px 16px 80px;
+    }
+
+    .card {
+      background: var(--clr-surface);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 40px 36px;
+      width: 100%;
+      max-width: 640px;
+      animation: fadeIn .35s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(16px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .logo-label {
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      color: var(--clr-primary);
+      margin-bottom: 8px;
+    }
+
+    h1 {
+      font-size: clamp(1.5rem, 4vw, 2.1rem);
+      font-weight: 700;
+      color: var(--clr-text);
+      margin-bottom: 20px;
+      line-height: 1.25;
+    }
+
+    h2.question-title {
+      font-size: clamp(1.05rem, 2.5vw, 1.25rem);
+      font-weight: 600;
+      color: var(--clr-text);
+      margin-bottom: 24px;
+      line-height: 1.45;
+    }
+
+    p.intro-text {
+      font-size: 1rem;
+      color: var(--clr-muted);
+      margin-bottom: 20px;
+      line-height: 1.7;
+    }
+
+    .badges {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 28px;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 5px 12px;
+      border-radius: 999px;
+      background: var(--clr-primary-light);
+      color: var(--clr-primary);
+      font-size: 13px;
+      font-weight: 500;
+    }
+
+    .badge svg { width: 14px; height: 14px; flex-shrink: 0; }
+
+    .divider { height: 1px; background: var(--clr-border); margin: 20px 0; }
+
+    .options-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-bottom: 28px;
+    }
+
+    .option-btn {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      padding: 14px 16px;
+      border: 2px solid var(--clr-border);
+      border-radius: var(--radius);
+      background: var(--clr-surface);
+      cursor: pointer;
+      text-align: left;
+      font-size: 15px;
+      color: var(--clr-text);
+      transition: border-color .18s, background .18s, box-shadow .18s;
+      width: 100%;
+      line-height: 1.5;
+    }
+
+    .option-btn:hover  { border-color: var(--clr-primary); background: var(--clr-primary-light); }
+    .option-btn.selected {
+      border-color: var(--clr-primary);
+      background: var(--clr-primary-light);
+      box-shadow: 0 0 0 3px rgba(124,58,237,.15);
+    }
+
+    .opt-indicator {
+      flex-shrink: 0;
+      width: 20px; height: 20px;
+      border-radius: 50%;
+      border: 2px solid var(--clr-border);
+      margin-top: 1px;
+      transition: border-color .18s, background .18s;
+      position: relative;
+    }
+
+    .option-btn.selected .opt-indicator {
+      border-color: var(--clr-primary);
+      background: var(--clr-primary);
+    }
+
+    .option-btn.selected .opt-indicator::after {
+      content: '';
+      position: absolute;
+      inset: 3px;
+      border-radius: 50%;
+      background: #fff;
+    }
+
+    .opt-indicator.checkbox { border-radius: 5px; }
+
+    .option-btn.selected .opt-indicator.checkbox::after {
+      content: '✓';
+      position: absolute;
+      inset: 0;
+      border-radius: 4px;
+      color: #fff;
+      font-size: 12px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .altre-input {
+      margin-top: 10px;
+      width: 100%;
+      padding: 10px 14px;
+      border: 2px solid var(--clr-border);
+      border-radius: 10px;
+      font-size: 15px;
+      color: var(--clr-text);
+      background: var(--clr-bg);
+      transition: border-color .18s;
+      outline: none;
+    }
+    .altre-input:focus { border-color: var(--clr-primary); }
+
+    .error-msg {
+      display: none;
+      color: var(--clr-error);
+      font-size: 14px;
+      margin-bottom: 14px;
+      padding: 10px 14px;
+      background: #fef2f2;
+      border-radius: 8px;
+      border: 1px solid #fecaca;
+    }
+    .error-msg.visible { display: block; }
+
+    .btn-primary {
+      display: block;
+      width: 100%;
+      padding: 15px 24px;
+      background: var(--clr-primary);
+      color: #fff;
+      font-size: 16px;
+      font-weight: 600;
+      border: none;
+      border-radius: var(--radius);
+      cursor: pointer;
+      transition: background .18s, transform .1s;
+      letter-spacing: .02em;
+    }
+    .btn-primary:hover  { background: var(--clr-primary-hover); }
+    .btn-primary:active { transform: scale(.98); }
+
+    .thankyou-icon  { font-size: 56px; text-align: center; margin-bottom: 16px; }
+    .thankyou-title { font-size: 1.8rem; font-weight: 700; text-align: center; color: var(--clr-primary); margin-bottom: 12px; }
+    .thankyou-msg   { text-align: center; color: var(--clr-muted); font-size: 1rem; line-height: 1.7; }
+
+    /* ── Admin trigger footer ── */
+    #admin-trigger-bar {
+      position: fixed;
+      bottom: 0; left: 0; right: 0;
+      text-align: center;
+      padding: 10px;
+      pointer-events: none;
+    }
+
+    #btn-admin-trigger {
+      pointer-events: all;
+      background: none;
+      border: none;
+      color: #c4b5fd;
+      font-size: 11px;
+      cursor: pointer;
+      opacity: .45;
+      transition: opacity .2s;
+      letter-spacing: .04em;
+    }
+    #btn-admin-trigger:hover { opacity: 1; }
+
+    /* ── Password modal ── */
+    #pw-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(30,27,46,.55);
+      backdrop-filter: blur(4px);
+      z-index: 999;
+      align-items: center;
+      justify-content: center;
+    }
+    #pw-overlay.visible { display: flex; }
+
+    #pw-box {
+      background: var(--clr-surface);
+      border-radius: var(--radius);
+      box-shadow: 0 8px 40px rgba(0,0,0,.25);
+      padding: 36px 32px;
+      width: 100%;
+      max-width: 380px;
+      animation: fadeIn .25s ease;
+    }
+
+    #pw-box h3 { font-size: 1.15rem; font-weight: 700; color: var(--clr-primary); margin-bottom: 6px; }
+    #pw-box p  { font-size: 13px; color: var(--clr-muted); margin-bottom: 20px; }
+
+    #pw-input {
+      width: 100%;
+      padding: 12px 14px;
+      border: 2px solid var(--clr-border);
+      border-radius: 10px;
+      font-size: 15px;
+      color: var(--clr-text);
+      outline: none;
+      margin-bottom: 10px;
+      transition: border-color .18s;
+    }
+    #pw-input:focus { border-color: var(--clr-primary); }
+
+    #pw-error {
+      color: var(--clr-error);
+      font-size: 13px;
+      margin-bottom: 12px;
+      display: none;
+    }
+    #pw-error.visible { display: block; }
+
+    .pw-buttons { display: flex; gap: 10px; }
+    .pw-buttons button { flex: 1; padding: 11px; border-radius: 10px; font-size: 14px; font-weight: 600; border: none; cursor: pointer; transition: opacity .18s; }
+    #btn-pw-ok     { background: var(--clr-primary); color: #fff; }
+    #btn-pw-cancel { background: #e5e7eb; color: var(--clr-text); }
+    .pw-buttons button:hover { opacity: .85; }
+
+    /* ══════════════════════════════
+       ADMIN VIEW
+    ══════════════════════════════ */
+    #admin-view { display: none; }
+
+    #admin-header {
+      background: var(--clr-primary);
+      color: #fff;
+      padding: 16px 32px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: 0 2px 12px rgba(0,0,0,.18);
+    }
+    #admin-header h2 { font-size: 1.1rem; font-weight: 700; }
+    #admin-header p  { font-size: 13px; opacity: .85; }
+
+    .header-right { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+
+    .btn-sm {
+      padding: 7px 14px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 600;
+      border: none;
+      cursor: pointer;
+      transition: opacity .18s;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+    }
+    .btn-sync    { background: #10b981; color: #fff; }
+    .btn-danger  { background: #ef4444; color: #fff; }
+    .btn-export  { background: #fff; color: var(--clr-primary); }
+    .btn-back    { background: rgba(255,255,255,.2); color: #fff; }
+    .btn-sm:hover { opacity: .85; }
+
+    #admin-main {
+      max-width: 1160px;
+      margin: 0 auto;
+      padding: 32px 24px 64px;
+    }
+
+    .cloud-status {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      background: #eff6ff;
+      border: 1px solid #bfdbfe;
+      border-radius: 8px;
+      padding: 10px 16px;
+      font-size: 13px;
+      margin-bottom: 20px;
+      color: #1e40af;
+    }
+
+    .tabs {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+      margin-bottom: 28px;
+      border-bottom: 2px solid var(--clr-border);
+    }
+
+    .tab-btn {
+      padding: 10px 18px;
+      border: none;
+      background: none;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--clr-muted);
+      border-bottom: 3px solid transparent;
+      margin-bottom: -2px;
+      transition: color .18s, border-color .18s;
+      border-radius: 6px 6px 0 0;
+    }
+    .tab-btn:hover  { color: var(--clr-primary); }
+    .tab-btn.active { color: var(--clr-primary); border-bottom-color: var(--clr-primary); font-weight: 700; }
+
+    .admin-card {
+      background: var(--clr-surface);
+      border-radius: 12px;
+      border: 1px solid var(--clr-border);
+      padding: 24px;
+      margin-bottom: 24px;
+      box-shadow: 0 2px 10px rgba(124,58,237,.07);
+    }
+
+    .card-title {
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: var(--clr-primary);
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .stat-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px,1fr)); gap: 16px; margin-bottom: 8px; }
+    .stat-box  { background: var(--clr-primary-light); border-radius: 10px; padding: 18px 16px; text-align: center; }
+    .stat-box .stat-num   { font-size: 2.1rem; font-weight: 700; color: var(--clr-primary); }
+    .stat-box .stat-label { font-size: 13px; color: var(--clr-muted); margin-top: 4px; }
+
+    .data-table { width: 100%; border-collapse: collapse; font-size: 14px; }
+    .data-table th {
+      background: var(--clr-primary);
+      color: #fff;
+      padding: 10px 14px;
+      text-align: left;
+      font-weight: 600;
+    }
+    .data-table th:first-child { border-radius: 8px 0 0 0; }
+    .data-table th:last-child  { border-radius: 0 8px 0 0; }
+    .data-table td { padding: 10px 14px; border-bottom: 1px solid var(--clr-border); vertical-align: middle; }
+    .data-table tr:nth-child(even) td { background: #f9f7ff; }
+    .data-table tr:last-child td { border-bottom: none; }
+
+    .bar-wrap  { display: flex; align-items: center; gap: 10px; min-width: 140px; }
+    .bar-track { flex: 1; height: 10px; background: #e5e7eb; border-radius: 99px; overflow: hidden; }
+    .bar-fill  { height: 100%; border-radius: 99px; background: var(--clr-primary); transition: width .5s ease; }
+
+    .sub-section { margin-top: 24px; padding-top: 16px; border-top: 1px dashed var(--clr-border); }
+    .sub-title   { font-size: 14px; font-weight: 700; color: var(--clr-primary); margin-bottom: 10px; text-transform: uppercase; letter-spacing: .05em; }
+
+    .cross-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    .cross-table th, .cross-table td { border: 1px solid var(--clr-border); padding: 8px 12px; }
+    .cross-table th { background: var(--clr-primary-light); color: var(--clr-text); font-weight: 600; }
+    .cross-table .row-header { background: #f3f0ff; font-weight: 600; }
+
+    .no-data { text-align: center; color: var(--clr-muted); padding: 48px 0; font-size: 15px; }
+
+    .n-badge {
+      display: inline-block;
+      background: #e5e7eb;
+      color: #374151;
+      border-radius: 4px;
+      font-size: 11px;
+      padding: 1px 6px;
+      margin-left: 4px;
+      font-weight: 600;
+    }
+
+    .emotion-tag {
+      display: inline-block;
+      padding: 3px 8px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 600;
+      background: #ede9fe;
+      color: #6d28d9;
+      border: 1px solid #ddd6fe;
+    }
+
+    .sit-tabs { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 20px; }
+    .sit-tab {
+      padding: 6px 14px;
+      border-radius: 999px;
+      border: 2px solid var(--clr-border);
+      background: var(--clr-surface);
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--clr-muted);
+      transition: all .18s;
+    }
+    .sit-tab.active { border-color: var(--clr-primary); background: var(--clr-primary-light); color: var(--clr-primary); font-weight: 700; }
+
+    .chi2-box {
+      background: #f0fdf4;
+      border: 1px solid #bbf7d0;
+      border-radius: 8px;
+      padding: 14px 18px;
+      font-size: 14px;
+      margin-top: 12px;
+    }
+    .chi2-box.insig { background: #fef9c3; border-color: #fde68a; }
+    .chi2-box .chi2-title { font-weight: 700; margin-bottom: 4px; }
+    .chi2-box .chi2-note  { font-size: 12px; color: var(--clr-muted); margin-top: 6px; }
+
+    .insight-box {
+      background: #fdf2f8;
+      border-left: 4px solid #ec4899;
+      padding: 14px 18px;
+      border-radius: 0 8px 8px 0;
+      margin-bottom: 20px;
+      font-size: 14px;
+      line-height: 1.6;
+    }
+
+    @media (max-width: 480px) {
+      .card { padding: 28px 20px; }
+      #admin-header { padding: 14px 16px; }
+      #admin-main { padding: 20px 12px 48px; }
+      .data-table th, .data-table td { padding: 8px 10px; font-size: 13px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ══════════════════════════════════════════════
+       PARTICIPANT VIEW
+  ══════════════════════════════════════════════ -->
+  <div id="participant-view">
+    <div class="card" id="screen-container"></div>
+  </div>
+
+  <!-- Trigger ocult al peu de pàgina -->
+  <div id="admin-trigger-bar">
+    <button id="btn-admin-trigger" title="Accés administradora">● administració</button>
+  </div>
+
+  <!-- Modal de contrasenya -->
+  <div id="pw-overlay">
+    <div id="pw-box">
+      <h3>🔐 Àrea restringida</h3>
+      <p>Introdueix la contrasenya per accedir al panell d'administració i recerca.</p>
+      <input id="pw-input" type="password" placeholder="Contrasenya..." autocomplete="off" />
+      <div id="pw-error">Contrasenya incorrecta. Torna-ho a intentar.</div>
+      <div class="pw-buttons">
+        <button id="btn-pw-cancel">Cancel·lar</button>
+        <button id="btn-pw-ok">Entrar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════
+       ADMIN VIEW
+  ══════════════════════════════════════════════ -->
+  <div id="admin-view">
+    <div id="admin-header">
+      <div>
+        <h2>🔐 Administració & Anàlisi — PR Psicologia</h2>
+        <p>Jessica Garnier · Estudi de Gènere i Expressió Emocional</p>
+      </div>
+      <div class="header-right">
+        <button class="btn-sm btn-sync"   onclick="syncFromCloud(true)">🔄 Sincronitzar dades</button>
+        <button class="btn-sm btn-export" onclick="exportCSV()">⬇ Exportar CSV</button>
+        <button class="btn-sm btn-danger" onclick="clearData()">🗑 Esborrar dades</button>
+        <button class="btn-sm btn-back"   onclick="exitAdmin()">✕ Sortir</button>
+      </div>
+    </div>
+
+    <div id="admin-main">
+      <div class="cloud-status" id="cloud-status-bar">
+        <span id="cloud-status-text">⏳ Carregant connexió amb Google Sheets...</span>
+        <small id="cloud-last-sync" style="opacity:.8;"></small>
+      </div>
+
+      <div class="tabs" id="admin-tabs">
+        <button class="tab-btn active" onclick="showTab('overview',this)">Visió general</button>
+        <button class="tab-btn" onclick="showTab('emotions',this)">🎯 Anàlisi Emocional & Gènere</button>
+        <button class="tab-btn" onclick="showTab('traits',this)">Conductes i interessos</button>
+        <button class="tab-btn" onclick="showTab('situations',this)">Situacions</button>
+        <button class="tab-btn" onclick="showTab('cross',this)">Creuaments generals</button>
+        <button class="tab-btn" onclick="showTab('stats',this)">Associacions estadístiques (χ²)</button>
+        <button class="tab-btn" onclick="showTab('raw',this)">Dades brutes</button>
+      </div>
+
+      <div id="tab-overview"   class="tab-content"></div>
+      <div id="tab-emotions"   class="tab-content" style="display:none"></div>
+      <div id="tab-traits"     class="tab-content" style="display:none"></div>
+      <div id="tab-situations" class="tab-content" style="display:none"></div>
+      <div id="tab-cross"      class="tab-content" style="display:none"></div>
+      <div id="tab-stats"      class="tab-content" style="display:none"></div>
+      <div id="tab-raw"        class="tab-content" style="display:none"></div>
+    </div>
+  </div>
+
+<script>
+// ════════════════════════════════════════════════════════
+//  CONFIGURACIÓ I CONTRASENYA
+// ════════════════════════════════════════════════════════
+const ADMIN_PASSWORD = 'jessica2025';
+
+// ✅ ENLLAÇ DE GOOGLE APPS SCRIPT CONFIGURAT:
+const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwalW7KhwzYjiZdPqA69dvcragoY-znvhbB6mhYSRY0OwSM9x76wP44Gr2LEfKE9Jj8/exec"; 
+
+// ════════════════════════════════════════════════════════
+//  CLASSIFICACIÓ ESTEREOTÍPICA DE CONDUCTES I INTERESSOS
+// ════════════════════════════════════════════════════════
+const TRAIT_STEREOTYPES = {
+  'Fer esport fora de l\'escola': 'Masc',
+  'Anar al gimnàs': 'Masc',
+  'Ser competitiu/competitiva': 'Masc',
+  'Ser líder': 'Masc',
+  'Jugar a videojocs': 'Masc',
+  'Tenir confiança en un mateix': 'Masc',
+  'Ajudar els altres sense que t\'ho demanin': 'Fem',
+  'Voler dedicar-se a una professió de l\'àmbit de l\'educació': 'Fem',
+  'Voler dedicar-se a una professió de l\'àmbit sanitari': 'Fem',
+  'Ser comprensiu/comprensiva': 'Fem',
+  'Que t\'agradi cuinar': 'Fem',
+  'Que t\'agradi anar a la moda': 'Fem'
+};
+
+// ════════════════════════════════════════════════════════
+//  CODIFICACIÓ TEÒRICA D'EMOCIONS (Marc de M. Chóliz)
+// ════════════════════════════════════════════════════════
+const SITUATION_EMOTIONS = {
+  laia: {
+    'S\'ha posat a plorar i ha preferit estar sola.': 'Tristesa',
+    'S\'ha enfadat i ha reaccionat de manera brusca.': 'Ira',
+    'Ha intentat animar la seva amiga i buscar una manera de continuar el contacte.': 'Alegria / Afecte',
+    'S\'ha mostrat sorpresa i no ha sabut com reaccionar.': 'Sorpresa',
+    'Ha mantingut la calma i ha acceptat la situació amb tranquil·litat.': 'Neutralitat',
+    'No ha mostrat cap reacció en especial.': 'Neutralitat'
+  },
+  marc: {
+    'Ha somrigut i ha compartit la notícia amb les persones del seu entorn.': 'Alegria',
+    'Ha celebrat el resultat amb entusiasme.': 'Alegria',
+    'Ha començat a plorar d\'emoció i ha abraçat algú proper.': 'Alegria emocional',
+    'S\'ha mostrat sorprès i li ha costat creure que hagués tret aquesta nota.': 'Sorpresa',
+    'Ha pensat que encara no era suficient i ha començat a preocupar-se pels pròxims exàmens.': 'Ansietat',
+    'Ha mantingut la calma i ha continuat amb normalitat.': 'Neutralitat'
+  },
+  julia: {
+    'Ha començat a plorar i ha intentat demanar ajuda desesperadament.': 'Por / Angoixa',
+    'Ha intentat mantenir la calma i ha controlat la seva respiració.': 'Por regulada',
+    'Ha actuat amb normalitat i ha esperat que l\'ascensor tornés a funcionar.': 'Neutralitat',
+    'Ha començat a cridar o ha reaccionat de manera brusca.': 'Por / Ira',
+    'S\'ha quedat quieta sense saber què fer.': 'Por / Angoixa'
+  },
+  nil: {
+    'Ha tancat el recipient immediatament i s\'ha allunyat.': 'Fàstic',
+    'Ha fet una ganyota i s\'ha tapat el nas.': 'Fàstic',
+    'Ha començat a cridar o ha reaccionat de manera brusca.': 'Sorpresa / Ira',
+    'Ha intentat mantenir la calma i ha comprovat què hi havia dins.': 'Curiositat',
+    'No ha mostrat cap reacció en especial.': 'Neutralitat'
+  },
+  carla: {
+    'Ha intentat mantenir la calma i ha parlat amb l\'altra persona per aclarir la situació.': 'Ira regulada',
+    'S\'ha quedat en silenci i ha preferit no dir res.': 'Ira suprimida',
+    'Ha intentat buscar una solució sense entrar en una discussió.': 'Ira regulada',
+    'Ha alçat la veu i ha reclamat que se li reconegués la feina que havia fet.': 'Ira expressada'
+  },
+  alex: {
+    'Ha obert la capsa immediatament per descobrir què hi havia a dins.': 'Curiositat / Alegria',
+    'S\'ha quedat mirant la capsa sense saber què fer.': 'Sorpresa',
+    'Ha preguntat als seus pares d\'on ha sortit la capsa.': 'Curiositat',
+    'Ha mantingut la calma i ha continuat fent el que normalment fa.': 'Neutralitat',
+    'No ha mostrat cap reacció especial.': 'Neutralitat'
+  }
+};
+
+// ════════════════════════════════════════════════════════
+//  DATA DEFINITIONS (PREGUNTES)
+// ════════════════════════════════════════════════════════
+const QUESTIONS = [
+  { id:'sex',    type:'single', hasOther:true,
+    text:'Quin és el teu sexe biològic?',
+    options:['Masculí','Femení','Altre'] },
+  { id:'gender', type:'single', hasOther:true,
+    text:'Amb quin gènere t\'identifiques?',
+    options:['Femení','Masculí','Altre'] },
+  { id:'traits', type:'multi',  hasOther:false,
+    text:'Amb quines d\'aquestes afirmacions t\'identifiques?',
+    options:[
+      'Fer esport fora de l\'escola','Anar al gimnàs','Ser competitiu/competitiva',
+      'Ser líder','Jugar a videojocs','Tenir confiança en un mateix',
+      'Ajudar els altres sense que t\'ho demanin',
+      'Voler dedicar-se a una professió de l\'àmbit de l\'educació',
+      'Voler dedicar-se a una professió de l\'àmbit sanitari',
+      'Ser comprensiu/comprensiva','Que t\'agradi cuinar','Que t\'agradi anar a la moda'
+    ] },
+  { id:'laia', type:'single', hasOther:false, targetGender:'Femení',
+    text:'Avui, la millor amiga de la Laia, una noia de 14 anys, ha anunciat que es traslladarà a una altra ciutat a causa del treball del seu pare i que, a partir d\'ara, no es podran veure tan sovint. Què creus que ha fet la Laia davant d\'aquesta situació?',
+    options:Object.keys(SITUATION_EMOTIONS.laia) },
+  { id:'marc', type:'single', hasOther:false, targetGender:'Masculí',
+    text:'El Marc sempre ha tingut moltes dificultats en matemàtiques i fins ara ha suspès tots els exàmens. Després de dedicar-hi molt de temps i esforç, avui ha rebut la nota del seu darrer examen i ha obtingut una A. Què creus que ha fet en Marc davant d\'aquesta situació?',
+    options:Object.keys(SITUATION_EMOTIONS.marc) },
+  { id:'julia', type:'single', hasOther:false, targetGender:'Femení',
+    text:'La Júlia torna a casa després de classe i entra sola a l\'ascensor, com cada dia, però de sobte l\'ascensor s\'atura entre dues plantes i s\'apaguen els llums. Intenta prémer els botons, però l\'ascensor no respon. Què creus que ha fet la Júlia davant d\'aquesta situació?',
+    options:Object.keys(SITUATION_EMOTIONS.julia) },
+  { id:'nil', type:'single', hasOther:false, targetGender:'Masculí',
+    text:'En Nil obre un recipient que porta molts dies tancat i nota una olor molt desagradable. Què creus que ha fet en Nil davant d\'aquesta situació?',
+    options:Object.keys(SITUATION_EMOTIONS.nil) },
+  { id:'carla', type:'single', hasOther:false, targetGender:'Femení',
+    text:'La Carla ha treballat molt en un projecte i, de sobte, una altra persona s\'atribueix tot el mèrit. Què creus que ha fet la Carla davant d\'aquesta situació?',
+    options:Object.keys(SITUATION_EMOTIONS.carla) },
+  { id:'alex', type:'single', hasOther:false, targetGender:'Masculí',
+    text:'L\'Àlex arriba a casa després de classe i troba una capsa gran al mig de la seva habitació. No recorda haver-la vist abans i no sap qui l\'ha deixada allà. Què creus que ha fet l\'Àlex davant d\'aquesta situació?',
+    options:Object.keys(SITUATION_EMOTIONS.alex) }
+];
+
+const SEX_OPTS    = ['Masculí','Femení','Altre'];
+const GENDER_OPTS = ['Femení','Masculí','Altre'];
+const PERCEIVED_OPTS = ['Expressió masculina', 'Expressió femenina', 'Expressió neutra/mixta'];
+const TRAITS_OPTS = QUESTIONS[2].options;
+const SITUATIONS  = [
+  { id:'laia',  label:'Laia',  charGender:'Femení', text:'Situació de la Laia',  opts: QUESTIONS[3].options },
+  { id:'marc',  label:'Marc',  charGender:'Masculí', text:'Situació d\'en Marc',  opts: QUESTIONS[4].options },
+  { id:'julia', label:'Júlia', charGender:'Femení', text:'Situació de la Júlia', opts: QUESTIONS[5].options },
+  { id:'nil',   label:'Nil',   charGender:'Masculí', text:'Situació d\'en Nil',   opts: QUESTIONS[6].options },
+  { id:'carla', label:'Carla', charGender:'Femení', text:'Situació de la Carla', opts: QUESTIONS[7].options },
+  { id:'alex',  label:'Àlex',  charGender:'Masculí', text:'Situació de l\'Àlex',  opts: QUESTIONS[8].options }
+];
+
+// ════════════════════════════════════════════════════════
+//  PARTICIPANT LOGIC
+// ════════════════════════════════════════════════════════
+let currentStep = -1;
+let answers = {};
+let participantCode = null;
+let cloudParticipants = null; // Dades sincronitzades de Google Sheets
+let activeTab = 'overview';
+
+function getLocalDB() {
+  try { return JSON.parse(localStorage.getItem('pr_psicologia_db') || '{"participants":[],"counter":0}'); }
+  catch { return { participants:[], counter:0 }; }
+}
+function saveLocalDB(db) { localStorage.setItem('pr_psicologia_db', JSON.stringify(db)); }
+
+function generateCode() {
+  const db = getLocalDB();
+  db.counter = (db.counter || 0) + 1;
+  const code = 'Participant ' + String(db.counter).padStart(3,'0');
+  saveLocalDB(db);
+  return code;
+}
+
+function saveLocalParticipant(code, data) {
+  const db = getLocalDB();
+  db.participants = db.participants.filter(p => p.code !== code);
+  db.participants.push({ code, timestamp: new Date().toISOString(), answers: data });
+  saveLocalDB(db);
+}
+
+const container = document.getElementById('screen-container');
+
+function renderWelcome() {
+  container.innerHTML = `
+    <div class="logo-label">PR Psicologia</div>
+    <h1>Jessica Garnier</h1>
+    <p class="intro-text">
+      Hola! Em dic Jessica Garnier, soc alumna de segon de batxillerat i, per al meu Projecte de Recerca,
+      m'agradaria que participessis en aquesta petita experiència. Hauràs de respondre unes preguntes i
+      reaccionar davant d'algunes situacions. No hi ha respostes correctes ni incorrectes: l'important
+      és respondre segons el que consideris que faria cada persona.
+    </p>
+    <div class="badges">
+      <span class="badge">
+        <svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>
+        Participació 100% anònima
+      </span>
+      <span class="badge">
+        <svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clip-rule="evenodd"/></svg>
+        Sense dades personals
+      </span>
+      <span class="badge">
+        <svg viewBox="0 0 20 20" fill="currentColor"><path d="M9 6a3 3 0 11-6 0 3 3 0 016 0zM17 6a3 3 0 11-6 0 3 3 0 016 0zM12.93 17c.046-.327.07-.66.07-1a6.97 6.97 0 00-1.5-4.33A5 5 0 0119 16v1h-6.07zM6 11a5 5 0 015 5v1H1v-1a5 5 0 015-5z"/></svg>
+        Finalitat acadèmica
+      </span>
+    </div>
+    <div class="divider"></div>
+    <p class="intro-text" style="font-size:13px;margin-bottom:24px;">
+      ℹ️ No es demanarà el teu nom ni cap dada personal. No hi ha respostes correctes ni incorrectes.
+      Les teves respostes s'empraran exclusivament per al Projecte de Recerca.
+    </p>
+    <button class="btn-primary" id="btn-start">Començar</button>
+  `;
+  document.getElementById('btn-start').addEventListener('click', () => {
+    participantCode = generateCode();
+    currentStep = 0;
+    renderQuestion();
+  });
+}
+
+function renderQuestion() {
+  const q = QUESTIONS[currentStep];
+  const isMulti = q.type === 'multi';
+  const saved = answers[q.id] || (isMulti ? [] : null);
+
+  let optionsHTML = '';
+  q.options.forEach((opt, i) => {
+    const isOther    = q.hasOther && opt === 'Altre';
+    const isSelected = isMulti ? saved.includes(opt) : saved === opt;
+    const indClass   = isMulti ? 'opt-indicator checkbox' : 'opt-indicator';
+    optionsHTML += `
+      <button class="option-btn ${isSelected ? 'selected' : ''}" data-opt="${i}" data-value="${opt}">
+        <span class="${indClass}"></span>
+        <span>${opt}</span>
+      </button>
+    `;
+    if (isOther) {
+      const otherVal = answers[q.id + '_other'] || '';
+      optionsHTML += `
+        <div id="altre-wrap" ${isSelected ? '' : 'style="display:none"'}>
+          <input class="altre-input" id="altre-input" type="text"
+            placeholder="Especifica la teva resposta..."
+            value="${otherVal}" autocomplete="off" />
+        </div>
+      `;
+    }
+  });
+
+  container.innerHTML = `
+    <h2 class="question-title">${q.text}</h2>
+    ${isMulti ? '<p style="font-size:13px;color:var(--clr-muted);margin-bottom:16px;">Pots seleccionar més d\'una opció.</p>' : ''}
+    <div class="options-list">${optionsHTML}</div>
+    <div class="error-msg" id="error-msg"></div>
+    <button class="btn-primary" id="btn-continue">Continuar</button>
+  `;
+
+  document.querySelectorAll('.option-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const val = btn.dataset.value;
+      if (isMulti) {
+        btn.classList.toggle('selected');
+        if (!answers[q.id]) answers[q.id] = [];
+        if (btn.classList.contains('selected')) {
+          if (!answers[q.id].includes(val)) answers[q.id].push(val);
+        } else {
+          answers[q.id] = answers[q.id].filter(v => v !== val);
+        }
+      } else {
+        document.querySelectorAll('.option-btn').forEach(b => b.classList.remove('selected'));
+        btn.classList.add('selected');
+        answers[q.id] = val;
+        if (q.hasOther) {
+          const w = document.getElementById('altre-wrap');
+          if (w) { w.style.display = (val === 'Altre') ? 'block' : 'none'; }
+          if (val !== 'Altre') delete answers[q.id + '_other'];
+        }
+      }
+      hideError();
+    });
+  });
+
+  const altreInput = document.getElementById('altre-input');
+  if (altreInput) altreInput.addEventListener('input', () => { answers[q.id + '_other'] = altreInput.value; });
+
+  document.getElementById('btn-continue').addEventListener('click', () => { validateAndAdvance(q, isMulti); });
+}
+
+function validateAndAdvance(q, isMulti) {
+  const val = answers[q.id];
+  if (isMulti) {
+    if (!val || val.length === 0) { showError('Selecciona almenys una resposta per continuar.'); return; }
+  } else {
+    if (!val) { showError('Selecciona una resposta per continuar.'); return; }
+    if (q.hasOther && val === 'Altre') {
+      const txt = (answers[q.id + '_other'] || '').trim();
+      if (!txt) { showError('Escriu una resposta per continuar.'); return; }
+      answers[q.id + '_other'] = txt;
+    }
+  }
+  currentStep++;
+  if (currentStep >= QUESTIONS.length) { finishExperience(); }
+  else { renderQuestion(); }
+  window.scrollTo({ top:0, behavior:'smooth' });
+}
+
+function showError(msg) {
+  const el = document.getElementById('error-msg');
+  if (el) { el.textContent = msg; el.classList.add('visible'); }
+}
+function hideError() {
+  const el = document.getElementById('error-msg');
+  if (el) el.classList.remove('visible');
+}
+
+function finishExperience() {
+  // 1. Guardar còpia local com a còpia de seguretat
+  saveLocalParticipant(participantCode, { ...answers });
+
+  // 2. Enviar a Google Sheets si la URL està configurada
+  if (GOOGLE_SCRIPT_URL && GOOGLE_SCRIPT_URL.startsWith('http')) {
+    const pObj = { answers: { ...answers } };
+    const scores = getTraitScores(pObj);
+    const payload = {
+      code: participantCode,
+      timestamp: new Date().toISOString(),
+      sex: resolveVal(pObj, 'sex'),
+      gender: resolveVal(pObj, 'gender'),
+      perceived_gender: scores.category,
+      masc_score: scores.masc,
+      fem_score: scores.fem,
+      traits: Array.isArray(answers.traits) ? answers.traits.join(' | ') : '',
+      laia_resp: answers.laia || '',
+      laia_emo: getEmotion('laia', answers.laia),
+      marc_resp: answers.marc || '',
+      marc_emo: getEmotion('marc', answers.marc),
+      julia_resp: answers.julia || '',
+      julia_emo: getEmotion('julia', answers.julia),
+      nil_resp: answers.nil || '',
+      nil_emo: getEmotion('nil', answers.nil),
+      carla_resp: answers.carla || '',
+      carla_emo: getEmotion('carla', answers.carla),
+      alex_resp: answers.alex || '',
+      alex_emo: getEmotion('alex', answers.alex)
+    };
+
+    fetch(GOOGLE_SCRIPT_URL, {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify(payload)
+    }).catch(err => console.log('Error enviant al núvol:', err));
+  }
+
+  container.innerHTML = `
+    <div class="thankyou-icon">🙏</div>
+    <div class="thankyou-title">Gràcies per participar!</div>
+    <p class="thankyou-msg">
+      Has completat l'experiència. Les teves respostes han estat enregistrades de manera anònima
+      i s'empraran exclusivament per al Projecte de Recerca de la Jessica Garnier.<br/><br/>
+      Pots tancar aquesta pàgina.
+    </p>
+  `;
+  window.scrollTo({ top:0, behavior:'smooth' });
+}
+
+// ════════════════════════════════════════════════════════
+//  ADMIN ACCESS — BOTÓ I CONTRASENYA
+// ════════════════════════════════════════════════════════
+document.getElementById('btn-admin-trigger').addEventListener('click', () => {
+  document.getElementById('pw-overlay').classList.add('visible');
+  document.getElementById('pw-input').value = '';
+  document.getElementById('pw-error').classList.remove('visible');
+  setTimeout(() => document.getElementById('pw-input').focus(), 100);
+});
+
+document.getElementById('btn-pw-cancel').addEventListener('click', closeModal);
+document.getElementById('btn-pw-ok').addEventListener('click', checkPassword);
+document.getElementById('pw-input').addEventListener('keydown', e => { if (e.key === 'Enter') checkPassword(); });
+
+function closeModal() { document.getElementById('pw-overlay').classList.remove('visible'); }
+
+function checkPassword() {
+  const val = document.getElementById('pw-input').value;
+  if (val === ADMIN_PASSWORD) {
+    closeModal();
+    openAdmin();
+  } else {
+    document.getElementById('pw-error').classList.add('visible');
+    document.getElementById('pw-input').value = '';
+    document.getElementById('pw-input').focus();
+  }
+}
+
+async function openAdmin() {
+  document.getElementById('participant-view').style.display = 'none';
+  document.getElementById('admin-trigger-bar').style.display = 'none';
+  document.getElementById('admin-view').style.display = 'block';
+  
+  // Intenta sincronitzar dades en obrir el panell
+  await syncFromCloud(false);
+
+  renderTab('overview');
+  document.querySelectorAll('#admin-tabs .tab-btn').forEach((b,i) => b.classList.toggle('active', i===0));
+  document.querySelectorAll('.tab-content').forEach((el,i) => el.style.display = i===0 ? 'block' : 'none');
+  window.scrollTo({ top:0, behavior:'smooth' });
+}
+
+function exitAdmin() {
+  document.getElementById('admin-view').style.display = 'none';
+  document.getElementById('participant-view').style.display = 'flex';
+  document.getElementById('admin-trigger-bar').style.display = 'block';
+  window.scrollTo({ top:0, behavior:'smooth' });
+}
+
+// ════════════════════════════════════════════════════════
+//  ADMIN — SINCRONITZACIÓ AMB GOOGLE SHEETS
+// ════════════════════════════════════════════════════════
+async function syncFromCloud(notify) {
+  const statusText = document.getElementById('cloud-status-text');
+  const lastSync = document.getElementById('cloud-last-sync');
+
+  if (!GOOGLE_SCRIPT_URL || !GOOGLE_SCRIPT_URL.startsWith('http')) {
+    statusText.innerHTML = '⚠️ <strong>Mode Local:</strong> Google Sheets encara no està configurat. Les dades es llegeixen del navegador actual.';
+    lastSync.textContent = '';
+    return;
+  }
+
+  statusText.innerHTML = '🔄 Connectant amb Google Sheets i descarregant respostes...';
+
+  try {
+    const res = await fetch(GOOGLE_SCRIPT_URL + '?action=get');
+    if (!res.ok) throw new Error('Error HTTP ' + res.status);
+    const data = await res.json();
+
+    if (Array.isArray(data)) {
+      cloudParticipants = data;
+      statusText.innerHTML = `✅ <strong>Connectat al núvol:</strong> S'han sincronitzat <strong>${data.length}</strong> participants de Google Sheets en temps real.`;
+      lastSync.textContent = 'Darrera actualització: ' + new Date().toLocaleTimeString('ca');
+      if (notify) alert(`S'han sincronitzat ${data.length} participants correctament des de Google Sheets!`);
+      renderTab(activeTab);
+    } else {
+      throw new Error('Format de dades no vàlid');
+    }
+  } catch (err) {
+    console.error('Error sincronitzant:', err);
+    statusText.innerHTML = `⚠️ <strong>Error de connexió:</strong> No s'ha pogut connectar amb Google Sheets. Mostrant dades locals. (${err.message})`;
+    if (notify) alert('No s\'ha pogut connectar amb Google Sheets. Comprova l\'enllaç o la connexió a internet.');
+  }
+}
+
+// ════════════════════════════════════════════════════════
+//  ADMIN — UTILITATS DE DADES I CÀLCUL
+// ════════════════════════════════════════════════════════
+function getParticipants() {
+  // Si tenim dades descarregades de Google Sheets, fem servir aquestes!
+  if (cloudParticipants && Array.isArray(cloudParticipants)) {
+    return cloudParticipants;
+  }
+  return getLocalDB().participants || [];
+}
+
+function pct(n, total) {
+  if (!total) return '—';
+  return ((n / total) * 100).toFixed(1) + ' %';
+}
+
+function barHTML(n, total) {
+  const w = total ? Math.round((n / total) * 100) : 0;
+  return `<div class="bar-wrap"><div class="bar-track"><div class="bar-fill" style="width:${w}%"></div></div><span style="font-size:12px;color:var(--clr-muted);white-space:nowrap">${w} %</span></div>`;
+}
+
+function resolveVal(p, key) {
+  if (!p || !p.answers) return '(no resposta)';
+  const v = p.answers[key];
+  if (!v) return '(no resposta)';
+  if (v === 'Altre') { const o = (p.answers[key + '_other'] || '').trim(); return o ? 'Altre: ' + o : 'Altre'; }
+  return v;
+}
+
+function sexKey(p)    { const v = resolveVal(p,'sex');    return v.startsWith('Altre') ? 'Altre' : v; }
+function genderKey(p) { const v = resolveVal(p,'gender'); return v.startsWith('Altre') ? 'Altre' : v; }
+
+// Càlcul del Gènere Percebut (Expressió conductual)
+function getTraitScores(p) {
+  const traits = (p && p.answers && Array.isArray(p.answers.traits)) ? p.answers.traits : [];
+  let masc = 0, fem = 0;
+  traits.forEach(t => {
+    if (TRAIT_STEREOTYPES[t] === 'Masc') masc++;
+    if (TRAIT_STEREOTYPES[t] === 'Fem') fem++;
+  });
+  let category = 'Expressió neutra/mixta';
+  if (masc > fem) category = 'Expressió masculina';
+  else if (fem > masc) category = 'Expressió femenina';
+  return { masc, fem, category, total: traits.length };
+}
+
+function perceivedKey(p) {
+  return getTraitScores(p).category;
+}
+
+// Resolució d'emoció d'una resposta
+function getEmotion(sitId, answerText) {
+  if (!answerText) return 'Sense resposta';
+  return (SITUATION_EMOTIONS[sitId] && SITUATION_EMOTIONS[sitId][answerText]) || 'Altre / No categoritzat';
+}
+
+// ════════════════════════════════════════════════════════
+//  ADMIN — GESTIÓ DE PESTANYES
+// ════════════════════════════════════════════════════════
+function showTab(name, btn) {
+  activeTab = name;
+  document.querySelectorAll('.tab-content').forEach(el => el.style.display = 'none');
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-' + name).style.display = 'block';
+  btn.classList.add('active');
+  renderTab(name);
+}
+
+let currentSitTab = 'laia';
+
+function renderTab(name) {
+  const ps = getParticipants();
+  if (name === 'overview')   renderOverview(ps);
+  if (name === 'emotions')   renderEmotions(ps);
+  if (name === 'traits')     renderTraits(ps);
+  if (name === 'situations') renderSituations(ps);
+  if (name === 'cross')      renderCross(ps);
+  if (name === 'stats')      renderStats(ps);
+  if (name === 'raw')        renderRaw(ps);
+}
+
+// ════════════════════════════════════════════════════════
+//  PESTANYA 1 — VISIÓ GENERAL
+// ════════════════════════════════════════════════════════
+function renderOverview(ps) {
+  const total = ps.length;
+  const el = document.getElementById('tab-overview');
+  if (total === 0) { el.innerHTML = `<div class="no-data">Encara no hi ha participants registrats.</div>`; return; }
+
+  const sexCounts = {}; SEX_OPTS.forEach(o => sexCounts[o] = 0);
+  ps.forEach(p => { const k = sexKey(p); if (sexCounts[k] !== undefined) sexCounts[k]++; else sexCounts['Altre']++; });
+
+  const gCounts = {}; GENDER_OPTS.forEach(o => gCounts[o] = 0);
+  ps.forEach(p => { const k = genderKey(p); if (gCounts[k] !== undefined) gCounts[k]++; else gCounts['Altre']++; });
+
+  const pCounts = {}; PERCEIVED_OPTS.forEach(o => pCounts[o] = 0);
+  ps.forEach(p => { const k = perceivedKey(p); if (pCounts[k] !== undefined) pCounts[k]++; else pCounts['Expressió neutra/mixta']++; });
+
+  el.innerHTML = `
+    <div class="admin-card">
+      <div class="card-title">📊 Resum general de la mostra</div>
+      <div class="stat-grid">
+        <div class="stat-box"><div class="stat-num">${total}</div><div class="stat-label">Participants totals</div></div>
+        <div class="stat-box"><div class="stat-num">${sexCounts['Femení']||0}</div><div class="stat-label">Sexe biològic Femení</div></div>
+        <div class="stat-box"><div class="stat-num">${sexCounts['Masculí']||0}</div><div class="stat-label">Sexe biològic Masculí</div></div>
+        <div class="stat-box"><div class="stat-num">${gCounts['Femení']||0}</div><div class="stat-label">Identitat Femenina</div></div>
+        <div class="stat-box"><div class="stat-num">${gCounts['Masculí']||0}</div><div class="stat-label">Identitat Masculina</div></div>
+      </div>
+    </div>
+
+    <div class="admin-card">
+      <div class="card-title">🎭 Gènere percebut (expressió conductual estereotípica)</div>
+      <p style="font-size:13px;color:var(--clr-muted);margin-bottom:14px;">
+        Calculat automàticament a partir del balanç entre conductes i interessos tradicionalment associats a patrons masculins o femenins (Pregunta 3).
+      </p>
+      <table class="data-table">
+        <tr><th>Classificació</th><th>Participants</th><th>Distribució</th></tr>
+        ${PERCEIVED_OPTS.map(o => `<tr><td><strong>${o}</strong></td><td><strong>${pCounts[o]||0}</strong> participants <span class="n-badge">n=${total}</span> <em style="color:var(--clr-muted)">(${pct(pCounts[o]||0,total)})</em></td><td>${barHTML(pCounts[o]||0,total)}</td></tr>`).join('')}
+      </table>
+    </div>
+
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:16px;">
+      <div class="admin-card">
+        <div class="card-title">⚧ Sexe biològic</div>
+        <table class="data-table">
+          <tr><th>Categoria</th><th>Participants</th><th>Distribució</th></tr>
+          ${SEX_OPTS.map(o => `<tr><td>${o}</td><td><strong>${sexCounts[o]||0}</strong> <span class="n-badge">n=${total}</span> <em style="color:var(--clr-muted)">(${pct(sexCounts[o]||0,total)})</em></td><td>${barHTML(sexCounts[o]||0,total)}</td></tr>`).join('')}
+        </table>
+      </div>
+      <div class="admin-card">
+        <div class="card-title">🏳️‍🌈 Identitat de gènere</div>
+        <table class="data-table">
+          <tr><th>Categoria</th><th>Participants</th><th>Distribució</th></tr>
+          ${GENDER_OPTS.map(o => `<tr><td>${o}</td><td><strong>${gCounts[o]||0}</strong> <span class="n-badge">n=${total}</span> <em style="color:var(--clr-muted)">(${pct(gCounts[o]||0,total)})</em></td><td>${barHTML(gCounts[o]||0,total)}</td></tr>`).join('')}
+        </table>
+      </div>
+    </div>
+  `;
+}
+
+// ════════════════════════════════════════════════════════
+//  PESTANYA 2 — ANÀLISI EMOCIONAL & GÈNERE PERCEBUT
+// ════════════════════════════════════════════════════════
+function renderEmotions(ps) {
+  const total = ps.length;
+  const el = document.getElementById('tab-emotions');
+  if (total === 0) { el.innerHTML = `<div class="no-data">Sense dades de participants.</div>`; return; }
+
+  let charTableHTML = '';
+  SITUATIONS.forEach(sit => {
+    const emoCounts = {};
+    ps.forEach(p => {
+      const resp = p.answers ? p.answers[sit.id] : '';
+      const emo = getEmotion(sit.id, resp);
+      emoCounts[emo] = (emoCounts[emo] || 0) + 1;
+    });
+
+    const sortedEmos = Object.keys(emoCounts).sort((a,b) => emoCounts[b] - emoCounts[a]);
+    const emoRows = sortedEmos.map(e => `
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:4px 0;font-size:13px;border-bottom:1px dotted #ede9fe;">
+        <span><span class="emotion-tag">${e}</span></span>
+        <span><strong>${emoCounts[e]}</strong> <span class="n-badge">n=${total}</span> <em>(${pct(emoCounts[e],total)})</em></span>
+      </div>
+    `).join('');
+
+    charTableHTML += `
+      <div style="background:#fcfaff;border:1px solid var(--clr-border);border-radius:10px;padding:16px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+          <strong style="color:var(--clr-primary);font-size:15px;">${sit.text}</strong>
+          <span style="font-size:12px;background:#f3f0ff;padding:2px 8px;border-radius:12px;color:var(--clr-muted);">Personatge: <strong>${sit.charGender}</strong></span>
+        </div>
+        ${emoRows}
+      </div>
+    `;
+  });
+
+  let perceivedCrossHTML = '';
+  SITUATIONS.forEach(sit => {
+    const allEmos = Array.from(new Set(Object.values(SITUATION_EMOTIONS[sit.id])));
+    
+    let tableRows = '';
+    PERCEIVED_OPTS.forEach(grp => {
+      const sub = ps.filter(p => perceivedKey(p) === grp);
+      const rowCells = allEmos.map(emo => {
+        const c = sub.filter(p => p.answers && getEmotion(sit.id, p.answers[sit.id]) === emo).length;
+        return `<td>${c} <span class="n-badge">n=${sub.length}</span><br><em style="font-size:11px;color:var(--clr-muted)">(${pct(c, sub.length)})</em></td>`;
+      }).join('');
+
+      tableRows += `
+        <tr>
+          <td class="row-header"><strong>${grp}</strong> (n=${sub.length})</td>
+          ${rowCells}
+        </tr>
+      `;
+    });
+
+    perceivedCrossHTML += `
+      <div style="margin-bottom:24px;">
+        <div style="font-weight:600;font-size:14px;color:var(--clr-primary);margin-bottom:8px;">
+          ${sit.text} (${sit.label} — Personatge ${sit.charGender})
+        </div>
+        <div style="overflow-x:auto">
+          <table class="cross-table">
+            <tr>
+              <th>Gènere percebut del participant ↓ / Emoció →</th>
+              ${allEmos.map(e => `<th><span class="emotion-tag">${e}</span></th>`).join('')}
+            </tr>
+            ${tableRows}
+          </table>
+        </div>
+      </div>
+    `;
+  });
+
+  el.innerHTML = `
+    <div class="insight-box">
+      <strong>💡 Marc Teòric de Mariano Chóliz integrat:</strong><br>
+      Aquesta pantalla tradueix les reaccions conductuals observables escollides pels adolescents a les seves emocions bàsiques i mecanismes de regulació emocional (Ira expressada vs regulada/suprimida, Por vs Por regulada, Tristesa, Alegria, etc.). Permet contrastar si les noies i els nois atribueixen emocions diferents depenent de si el personatge és un noi o una noia, i de la seva pròpia identitat/expressió de gènere.
+    </div>
+
+    <div class="admin-card">
+      <div class="card-title">🎭 Emocions atribuïdes a cadascun dels 6 personatges</div>
+      <p style="font-size:13px;color:var(--clr-muted);margin-bottom:16px;">
+        Distribució de les emocions interpretades per a cada adolescent protagonista.
+      </p>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:16px;">
+        ${charTableHTML}
+      </div>
+    </div>
+
+    <div class="admin-card">
+      <div class="card-title">🔗 Gènere percebut (conductes/interessos) ↔ Emocions atribuïdes</div>
+      <p style="font-size:13px;color:var(--clr-muted);margin-bottom:16px;">
+        Compara com responen els participants amb <strong>Expressió Masculina</strong> vs <strong>Expressió Femenina</strong> davant de cada situació.
+      </p>
+      ${perceivedCrossHTML}
+    </div>
+  `;
+}
+
+// ════════════════════════════════════════════════════════
+//  PESTANYA 3 — CONDUCTES I INTERESSOS
+// ════════════════════════════════════════════════════════
+function renderTraits(ps) {
+  const total = ps.length;
+  const el = document.getElementById('tab-traits');
+  if (total === 0) { el.innerHTML = `<div class="no-data">Sense dades.</div>`; return; }
+
+  const sexGroups = {}; SEX_OPTS.forEach(s => sexGroups[s] = ps.filter(p => sexKey(p) === s));
+  const genGroups = {}; GENDER_OPTS.forEach(g => genGroups[g] = ps.filter(p => genderKey(p) === g));
+
+  let rows = '';
+  TRAITS_OPTS.forEach(opt => {
+    const count = ps.filter(p => p.answers && Array.isArray(p.answers.traits) && p.answers.traits.includes(opt)).length;
+    const stype = TRAIT_STEREOTYPES[opt] === 'Masc' 
+      ? '<span style="color:#2563eb;font-weight:600;font-size:11px;background:#dbeafe;padding:2px 6px;border-radius:4px;">Estereotip Masc</span>'
+      : '<span style="color:#db2777;font-weight:600;font-size:11px;background:#fce7f3;padding:2px 6px;border-radius:4px;">Estereotip Fem</span>';
+
+    const bySex = SEX_OPTS.map(s => { 
+      const sg=sexGroups[s]; 
+      const c=sg.filter(p=>p.answers && Array.isArray(p.answers.traits)&&p.answers.traits.includes(opt)).length; 
+      return `${c} <span class="n-badge">n=${sg.length}</span> <em style="color:var(--clr-muted)">(${pct(c,sg.length)})</em>`; 
+    }).join(' / ');
+
+    const byGen = GENDER_OPTS.map(g => { 
+      const gg=genGroups[g]; 
+      const c=gg.filter(p=>p.answers && Array.isArray(p.answers.traits)&&p.answers.traits.includes(opt)).length; 
+      return `${c} <span class="n-badge">n=${gg.length}</span> <em style="color:var(--clr-muted)">(${pct(c,gg.length)})</em>`; 
+    }).join(' / ');
+
+    rows += `<tr>
+      <td>${opt}<br>${stype}</td>
+      <td><strong>${count}</strong> <span class="n-badge">n=${total}</span><br><em style="color:var(--clr-muted)">${pct(count,total)}</em></td>
+      <td>${barHTML(count,total)}</td>
+      <td style="font-size:12px">${bySex}</td>
+      <td style="font-size:12px">${byGen}</td>
+    </tr>`;
+  });
+
+  el.innerHTML = `
+    <div class="admin-card">
+      <div class="card-title">🧩 Conductes i interessos (pregunta 3, selecció múltiple)</div>
+      <p style="font-size:13px;color:var(--clr-muted);margin-bottom:16px;">
+        Mostra quines conductes seleccionen més els adolescents i com es distribueixen segons el sexe biològic i el gènere sentit.
+      </p>
+      <div style="overflow-x:auto">
+        <table class="data-table">
+          <tr>
+            <th>Afirmació</th>
+            <th>Total general</th>
+            <th>Distribució</th>
+            <th>Per sexe biològic (Masc / Fem / Altre)</th>
+            <th>Per identitat de gènere (Fem / Masc / Altre)</th>
+          </tr>
+          ${rows}
+        </table>
+      </div>
+    </div>`;
+}
+
+// ════════════════════════════════════════════════════════
+//  PESTANYA 4 — SITUACIONS INDIVIDUALS
+// ════════════════════════════════════════════════════════
+function renderSituations(ps) {
+  const el = document.getElementById('tab-situations');
+  const total = ps.length;
+  if (total === 0) { el.innerHTML = `<div class="no-data">Sense dades.</div>`; return; }
+
+  const sit = SITUATIONS.find(s => s.id === currentSitTab) || SITUATIONS[0];
+  const tabsHTML = SITUATIONS.map(s => `
+    <button class="sit-tab ${s.id===currentSitTab?'active':''}" onclick="currentSitTab='${s.id}';renderTab('situations');">
+      ${s.label} (${s.charGender})
+    </button>
+  `).join('');
+
+  const sexGroups = {}; SEX_OPTS.forEach(s => sexGroups[s] = ps.filter(p => sexKey(p) === s));
+  const genGroups = {}; GENDER_OPTS.forEach(g => genGroups[g] = ps.filter(p => genderKey(p) === g));
+  const pGroups   = {}; PERCEIVED_OPTS.forEach(o => pGroups[o] = ps.filter(p => perceivedKey(p) === o));
+
+  let rows = '';
+  sit.opts.forEach(opt => {
+    const emo = getEmotion(sit.id, opt);
+    const count = ps.filter(p => p.answers && p.answers[sit.id] === opt).length;
+
+    const bySex = SEX_OPTS.map(s => {
+      const sg = sexGroups[s];
+      const c = sg.filter(p => p.answers && p.answers[sit.id] === opt).length;
+      return `${c} (${pct(c, sg.length)})`;
+    }).join('<br>');
+
+    const byGen = GENDER_OPTS.map(g => {
+      const gg = genGroups[g];
+      const c = gg.filter(p => p.answers && p.answers[sit.id] === opt).length;
+      return `${c} (${pct(c, gg.length)})`;
+    }).join('<br>');
+
+    const byPer = PERCEIVED_OPTS.map(o => {
+      const pg = pGroups[o];
+      const c = pg.filter(p => p.answers && p.answers[sit.id] === opt).length;
+      return `${c} (${pct(c, pg.length)})`;
+    }).join('<br>');
+
+    rows += `<tr>
+      <td style="max-width:260px;line-height:1.4">
+        ${opt}<br>
+        <span class="emotion-tag" style="margin-top:4px;">${emo}</span>
+      </td>
+      <td><strong>${count}</strong> <span class="n-badge">n=${total}</span><br><em style="color:var(--clr-muted)">${pct(count,total)}</em></td>
+      <td>${barHTML(count,total)}</td>
+      <td style="font-size:12px;line-height:1.7">${bySex}</td>
+      <td style="font-size:12px;line-height:1.7">${byGen}</td>
+      <td style="font-size:12px;line-height:1.7">${byPer}</td>
+    </tr>`;
+  });
+
+  el.innerHTML = `
+    <div class="sit-tabs">${tabsHTML}</div>
+    <div class="admin-card">
+      <div class="card-title">📋 ${sit.text} (Protagonista: ${sit.label}, Gènere: ${sit.charGender})</div>
+      <div style="overflow-x:auto">
+        <table class="data-table">
+          <tr>
+            <th>Opció i Emoció codificada</th>
+            <th>Total (n=${total})</th>
+            <th>Distribució</th>
+            <th>Per sexe biològic<br><small style="opacity:.8">Masc / Fem / Altre</small></th>
+            <th>Per identitat de gènere<br><small style="opacity:.8">Fem / Masc / Altre</small></th>
+            <th>Per gènere percebut<br><small style="opacity:.8">Masc / Fem / Neutre</small></th>
+          </tr>
+          ${rows}
+        </table>
+      </div>
+    </div>`;
+}
+
+// ════════════════════════════════════════════════════════
+//  PESTANYA 5 — CREUAMENTS GENERALS
+// ════════════════════════════════════════════════════════
+function renderCross(ps) {
+  const total = ps.length;
+  const el = document.getElementById('tab-cross');
+  if (total === 0) { el.innerHTML = `<div class="no-data">Sense dades.</div>`; return; }
+
+  let crossRows1 = '';
+  SEX_OPTS.forEach(s => {
+    const sg = ps.filter(p => sexKey(p) === s);
+    crossRows1 += `<tr>
+      <td class="row-header">${s} (${sg.length})</td>
+      ${GENDER_OPTS.map(g => {
+        const c = sg.filter(p => genderKey(p) === g).length;
+        return `<td><strong>${c}</strong> <span class="n-badge">n=${sg.length}</span><br><em style="color:var(--clr-muted);font-size:12px">${pct(c,sg.length)}</em></td>`;
+      }).join('')}
+      <td><strong>${sg.length}</strong></td>
+    </tr>`;
+  });
+  crossRows1 += `<tr style="background:#f3f0ff">
+    <td class="row-header"><strong>Total</strong></td>
+    ${GENDER_OPTS.map(g => {
+      const c = ps.filter(p => genderKey(p) === g).length;
+      return `<td><strong>${c}</strong> <em style="font-size:12px;color:var(--clr-muted)">(${pct(c,total)})</em></td>`;
+    }).join('')}
+    <td><strong>${total}</strong></td>
+  </tr>`;
+
+  let crossRows2 = '';
+  SEX_OPTS.forEach(s => {
+    const sg = ps.filter(p => sexKey(p) === s);
+    crossRows2 += `<tr>
+      <td class="row-header">${s} (${sg.length})</td>
+      ${PERCEIVED_OPTS.map(o => {
+        const c = sg.filter(p => perceivedKey(p) === o).length;
+        return `<td><strong>${c}</strong> <span class="n-badge">n=${sg.length}</span><br><em style="color:var(--clr-muted);font-size:12px">${pct(c,sg.length)}</em></td>`;
+      }).join('')}
+      <td><strong>${sg.length}</strong></td>
+    </tr>`;
+  });
+
+  el.innerHTML = `
+    <div class="admin-card">
+      <div class="card-title">🔀 Creuament 1: Sexe biològic × Identitat de gènere</div>
+      <p style="font-size:13px;color:var(--clr-muted);margin-bottom:14px;">
+        Indispensable per determinar concordança (cisgènere) o discordança (transgènere / no binari).
+      </p>
+      <div style="overflow-x:auto">
+        <table class="cross-table">
+          <tr><th>Sexe biològic ↓ / Identitat de gènere →</th>${GENDER_OPTS.map(g=>`<th>${g}</th>`).join('')}<th>Total</th></tr>
+          ${crossRows1}
+        </table>
+      </div>
+    </div>
+
+    <div class="admin-card">
+      <div class="card-title">🔀 Creuament 2: Sexe biològic × Gènere percebut (conductes/interessos)</div>
+      <p style="font-size:13px;color:var(--clr-muted);margin-bottom:14px;">
+        Permet comprovar si el sexe biològic prediu realment les conductes tradicionalment estereotipades.
+      </p>
+      <div style="overflow-x:auto">
+        <table class="cross-table">
+          <tr><th>Sexe biològic ↓ / Gènere percebut →</th>${PERCEIVED_OPTS.map(o=>`<th>${o}</th>`).join('')}<th>Total</th></tr>
+          ${crossRows2}
+        </table>
+      </div>
+    </div>
+  `;
+}
+
+// ════════════════════════════════════════════════════════
+//  PESTANYA 6 — ASSOCIACIONS ESTADÍSTIQUES (χ²)
+// ════════════════════════════════════════════════════════
+function chiSquare(table) {
+  const R = table.length, C = table[0].length;
+  const rowTot = table.map(r => r.reduce((a,b)=>a+b,0));
+  const colTot = Array.from({length:C},(_,j)=>table.reduce((a,r)=>a+r[j],0));
+  const grand  = rowTot.reduce((a,b)=>a+b,0);
+  if (!grand) return {chi2:null,df:null,p:null};
+  let chi2 = 0;
+  for (let i=0;i<R;i++) for (let j=0;j<C;j++) { 
+    const E=(rowTot[i]*colTot[j])/grand; 
+    if(E>0) chi2+=Math.pow(table[i][j]-E,2)/E; 
+  }
+  const df = (R-1)*(C-1);
+  return { chi2: chi2.toFixed(3), df, p: chiCDF(chi2,df).toFixed(4) };
+}
+
+function chiCDF(x,df) { if(x<=0||df<=0) return 1; return 1-incGammaReg(df/2,x/2); }
+function incGammaReg(a,x) { if(x<=0) return 0; let sum=1/a,term=1/a,n=1; for(let i=0;i<200;i++){term*=x/(a+n);sum+=term;if(Math.abs(term)<1e-10)break;n++;} return sum*Math.exp(-x+a*Math.log(x)-logGamma(a)); }
+function logGamma(z) { const c=[76.18009172947146,-86.50532032941677,24.01409824083091,-1.231739572450155,.1208650973866179e-2,-.5395239384953e-5]; let y=z,x=z,tmp=x+5.5; tmp-=(x+.5)*Math.log(tmp); let ser=1.000000000190015; c.forEach((ci)=>{y++;ser+=ci/y;}); return -tmp+Math.log(2.5066282746310005*ser/x); }
+function pLabel(p) { if(p===null) return 'No calculable'; const n=parseFloat(p); if(n<.001) return 'p < 0.001 (molt significatiu)'; if(n<.01) return 'p < 0.01 (significatiu)'; if(n<.05) return 'p < 0.05 (significatiu)'; return `p = ${p} (no significatiu)`; }
+
+function renderStats(ps) {
+  const el = document.getElementById('tab-stats');
+  const total = ps.length;
+  if (total < 5) { el.innerHTML = `<div class="no-data">Necessites un mínim de 5 respostes per calcular el test χ² (actualment n = ${total}).</div>`; return; }
+
+  let html = `<div class="admin-card"><div class="card-title">📐 Associacions estadístiques (Test de Chi-quadrat χ²)</div>
+    <p style="font-size:13px;color:var(--clr-muted);margin-bottom:20px;">
+      Avalua si les diferències observades entre grups són estadísticament significatives (p &lt; 0.05) o si es poden deure a l'atzar. Mostra total analitzada: <strong>${total}</strong> participants.
+    </p>`;
+
+  SITUATIONS.forEach(sit => {
+    const emos = Array.from(new Set(Object.values(SITUATION_EMOTIONS[sit.id])));
+    
+    const tS = SEX_OPTS.map(s => { const sg=ps.filter(p=>sexKey(p)===s); return emos.map(e => sg.filter(p=>p.answers && getEmotion(sit.id,p.answers[sit.id])===e).length); });
+    const cS = chiSquare(tS);
+    const sS = cS.p!==null && parseFloat(cS.p)<.05;
+
+    const tP = PERCEIVED_OPTS.map(o => { const pg=ps.filter(p=>perceivedKey(p)===o); return emos.map(e => pg.filter(p=>p.answers && getEmotion(sit.id,p.answers[sit.id])===e).length); });
+    const cP = chiSquare(tP);
+    const sP = cP.p!==null && parseFloat(cP.p)<.05;
+
+    html += `<div class="sub-section">
+      <div class="sub-title">${sit.text} (${sit.label} — ${sit.charGender})</div>
+      <div class="chi2-box ${sS?'':'insig'}">
+        <div class="chi2-title">Sexe biològic ↔ Emoció a ${sit.label}</div>
+        χ² = ${cS.chi2??'—'} &nbsp;|&nbsp; gl = ${cS.df??'—'} &nbsp;|&nbsp; ${pLabel(cS.p)}
+        <div class="chi2-note">${sS?'✅ <strong>Hi ha associació significativa:</strong> el sexe del participant condiciona l\'emoció atribuïda.':'⚠️ <strong>Sense associació significativa:</strong> no s\'observen patrons diferents per sexe biològic.'}</div>
+      </div>
+      <div class="chi2-box ${sP?'':'insig'}" style="margin-top:8px">
+        <div class="chi2-title">Gènere percebut (conductes) ↔ Emoció a ${sit.label}</div>
+        χ² = ${cP.chi2??'—'} &nbsp;|&nbsp; gl = ${cP.df??'—'} &nbsp;|&nbsp; ${pLabel(cP.p)}
+        <div class="chi2-note">${sP?'✅ <strong>Hi ha associació significativa:</strong> l\'expressió de gènere estereotípica condiciona l\'emoció atribuïda.':'⚠️ <strong>Sense associació significativa:</strong> no s\'observa patró diferencial estadístic.'}</div>
+      </div>
+    </div>`;
+  });
+
+  html += `</div>`;
+  el.innerHTML = html;
+}
+
+// ════════════════════════════════════════════════════════
+//  PESTANYA 7 — DADES BRUTES
+// ════════════════════════════════════════════════════════
+function renderRaw(ps) {
+  const el = document.getElementById('tab-raw');
+  if (ps.length === 0) { el.innerHTML = `<div class="no-data">Sense dades.</div>`; return; }
+
+  const rows = ps.map(p => {
+    const scores = getTraitScores(p);
+    return `<tr>
+      <td style="white-space:nowrap;font-size:12px"><strong>${p.code || '—'}</strong></td>
+      <td style="font-size:12px">${p.timestamp ? new Date(p.timestamp).toLocaleString('ca') : '—'}</td>
+      <td>${resolveVal(p,'sex')}</td>
+      <td>${resolveVal(p,'gender')}</td>
+      <td>
+        <span class="emotion-tag">${scores.category}</span><br>
+        <small style="color:var(--clr-muted)">Masc: ${scores.masc} | Fem: ${scores.fem}</small>
+      </td>
+      ${SITUATIONS.map(s => {
+        const resp = (p.answers && p.answers[s.id]) || '—';
+        const emo = getEmotion(s.id, resp);
+        return `<td style="font-size:12px;line-height:1.3;max-width:140px;">
+          <span class="emotion-tag" style="font-size:11px;">${emo}</span><br>
+          <span style="color:var(--clr-muted);font-size:11px;">${resp}</span>
+        </td>`;
+      }).join('')}
+    </tr>`;
+  }).join('');
+
+  el.innerHTML = `
+    <div class="admin-card">
+      <div class="card-title">📄 Registre individual complet (${ps.length} participants)</div>
+      <p style="font-size:12px;color:var(--clr-muted);margin-bottom:14px;">
+        Inclou el codi anònim, timestamps, gènere percebut calculat i l'emoció associada a cada situació.
+      </p>
+      <div style="overflow-x:auto">
+        <table class="data-table" style="font-size:12px">
+          <tr>
+            <th>Codi</th><th>Data/hora</th><th>Sexe biològic</th><th>Gènere sentit</th><th>Gènere percebut (conductes)</th>
+            ${SITUATIONS.map(s => `<th>${s.label} (${s.charGender})</th>`).join('')}
+          </tr>
+          ${rows}
+        </table>
+      </div>
+    </div>`;
+}
+
+// ════════════════════════════════════════════════════════
+//  EXPORTACIÓ A CSV
+// ════════════════════════════════════════════════════════
+function exportCSV() {
+  const ps = getParticipants();
+  if (!ps.length) { alert('Sense dades per exportar.'); return; }
+  const esc = v => '"' + String(v||'').replace(/"/g,'""') + '"';
+
+  const headers = [
+    'Codi',
+    'Timestamp',
+    'Sexe_Biologic',
+    'Identitat_Genere',
+    'Genere_Percebut',
+    'Punts_Masc',
+    'Punts_Fem',
+    'Conductes_Interessos',
+    'Emocio_Laia', 'Resposta_Laia',
+    'Emocio_Marc', 'Resposta_Marc',
+    'Emocio_Julia', 'Resposta_Julia',
+    'Emocio_Nil', 'Resposta_Nil',
+    'Emocio_Carla', 'Resposta_Carla',
+    'Emocio_Alex', 'Resposta_Alex'
+  ];
+
+  const rows = ps.map(p => {
+    const scores = getTraitScores(p);
+    const ans = p.answers || {};
+    return [
+      esc(p.code),
+      esc(p.timestamp || ''),
+      esc(resolveVal(p,'sex')),
+      esc(resolveVal(p,'gender')),
+      esc(scores.category),
+      scores.masc,
+      scores.fem,
+      esc(Array.isArray(ans.traits) ? ans.traits.join(' | ') : ''),
+      esc(getEmotion('laia', ans['laia'])), esc(ans['laia']),
+      esc(getEmotion('marc', ans['marc'])), esc(ans['marc']),
+      esc(getEmotion('julia', ans['julia'])), esc(ans['julia']),
+      esc(getEmotion('nil', ans['nil'])), esc(ans['nil']),
+      esc(getEmotion('carla', ans['carla'])), esc(ans['carla']),
+      esc(getEmotion('alex', ans['alex'])), esc(ans['alex'])
+    ].join(',');
+  });
+
+  const csv = [headers.join(','), ...rows].join('\r\n');
+  const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'PR_Psicologia_Dades_Emocions_Jessica_Garnier.csv';
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+// ════════════════════════════════════════════════════════
+//  ESBORRAR DADES
+// ════════════════════════════════════════════════════════
+function clearData() {
+  if (!confirm('Vols esborrar les dades locals del navegador? Nota: Si fas servir Google Sheets, les dades continuaran segures al teu full de càlcul de Google.')) return;
+  localStorage.removeItem('pr_psicologia_db');
+  cloudParticipants = null;
+  renderTab('overview');
+  alert('Dades locals reiniciades.');
+}
+
+// ════════════════════════════════════════════════════════
+//  INICIALITZACIÓ
+// ════════════════════════════════════════════════════════
+renderWelcome();
+</script>
+</body>
+</html>
