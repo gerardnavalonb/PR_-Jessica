@@ -504,7 +504,32 @@
       #admin-main { padding: 20px 12px 48px; }
       .data-table th, .data-table td { padding: 8px 10px; font-size: 13px; }
     }
+
+    /* ── Charts ── */
+    .charts-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 16px;
+      margin-top: 20px;
+    }
+    .chart-card {
+      background: var(--clr-bg);
+      border-radius: 10px;
+      border: 1px solid var(--clr-border);
+      padding: 16px 16px 10px;
+    }
+    .chart-inner-title {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--clr-primary);
+      text-align: center;
+      margin-bottom: 10px;
+    }
+    .chart-wrap      { position: relative; height: 220px; }
+    .chart-wrap-md   { position: relative; height: 280px; }
+    .chart-wrap-lg   { position: relative; height: 340px; }
   </style>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 </head>
 <body>
 
@@ -1063,6 +1088,97 @@ function getEmotion(sitId, answerText) {
 }
 
 // ════════════════════════════════════════════════════════
+//  CHART HELPERS
+// ════════════════════════════════════════════════════════
+const _charts = {};  // registre d'instàncies actives
+
+function _destroyChart(id) {
+  if (_charts[id]) { _charts[id].destroy(); delete _charts[id]; }
+}
+
+// Colors per emoció
+const EMOTION_COLORS = {
+  'Tristesa':           '#3b82f6',
+  'Ira':                '#ef4444',
+  'Ira expressada':     '#dc2626',
+  'Ira regulada':       '#f97316',
+  'Ira suprimida':      '#fca5a5',
+  'Alegria':            '#fbbf24',
+  'Alegria emocional':  '#f59e0b',
+  'Alegria / Afecte':   '#fde68a',
+  'Por / Angoixa':      '#7c3aed',
+  'Por regulada':       '#a78bfa',
+  'Por / Ira':          '#c026d3',
+  'Fàstic':             '#10b981',
+  'Sorpresa':           '#8b5cf6',
+  'Sorpresa / Ira':     '#ec4899',
+  'Curiositat':         '#06b6d4',
+  'Curiositat / Alegria':'#22d3ee',
+  'Neutralitat':        '#9ca3af',
+  'Ansietat':           '#f472b6',
+  'Sense resposta':     '#e5e7eb'
+};
+const SEX_COLORS      = { 'Masculí': '#3b82f6', 'Femení': '#ec4899', 'Altre': '#8b5cf6' };
+const PERCEIVED_COLORS= { 'Expressió masculina': '#3b82f6', 'Expressió femenina': '#ec4899', 'Expressió neutra/mixta': '#9ca3af' };
+const GROUP_PALETTE   = ['#7c3aed','#06b6d4','#10b981','#f59e0b','#ef4444','#8b5cf6','#ec4899','#f97316'];
+
+function emoColor(e) { return EMOTION_COLORS[e] || '#c4b5fd'; }
+
+// Gràfic de formatget (donut)
+function makeDonut(id, labels, data, colors) {
+  _destroyChart(id);
+  const ctx = document.getElementById(id);
+  if (!ctx || !data.some(d => d > 0)) return;
+  const total = data.reduce((a,b) => a+b, 0);
+  _charts[id] = new Chart(ctx, {
+    type: 'doughnut',
+    data: { labels, datasets: [{ data, backgroundColor: colors, borderWidth: 2, borderColor: '#fff', hoverOffset: 6 }] },
+    options: {
+      responsive: true, maintainAspectRatio: false, cutout: '62%',
+      plugins: {
+        legend: { position: 'bottom', labels: { font: { size: 12 }, padding: 12, boxWidth: 14 } },
+        tooltip: { callbacks: { label: c => ` ${c.label}: ${c.raw} (${((c.raw/total)*100).toFixed(1)}%)` } }
+      }
+    }
+  });
+}
+
+// Gràfic de barres agrupades (vertical)
+function makeBarGrouped(id, labels, datasets) {
+  _destroyChart(id);
+  const ctx = document.getElementById(id);
+  if (!ctx) return;
+  _charts[id] = new Chart(ctx, {
+    type: 'bar',
+    data: { labels, datasets: datasets.map(d => ({ ...d, borderRadius: 4, borderSkipped: false })) },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { position: 'bottom', labels: { font: { size: 11 }, padding: 10, boxWidth: 12 } } },
+      scales: { x: { ticks: { font: { size: 10 } } }, y: { beginAtZero: true, ticks: { stepSize: 1 } } }
+    }
+  });
+}
+
+// Gràfic de barres horitzontals
+function makeBarH(id, labels, data, colors) {
+  _destroyChart(id);
+  const ctx = document.getElementById(id);
+  if (!ctx) return;
+  const total = data.reduce((a,b) => a+b, 0);
+  _charts[id] = new Chart(ctx, {
+    type: 'bar',
+    data: { labels, datasets: [{ data, backgroundColor: colors, borderRadius: 4, borderSkipped: false }] },
+    options: {
+      indexAxis: 'y', responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { display: false },
+        tooltip: { callbacks: { label: c => ` ${c.raw} participants (${total ? ((c.raw/total)*100).toFixed(1) : 0}%)` } }
+      },
+      scales: { x: { beginAtZero: true, ticks: { stepSize: 1 } }, y: { ticks: { font: { size: 11 } } } }
+    }
+  });
+}
+
+// ════════════════════════════════════════════════════════
 //  ADMIN — GESTIÓ DE PESTANYES
 // ════════════════════════════════════════════════════════
 function showTab(name, btn) {
@@ -1143,7 +1259,28 @@ function renderOverview(ps) {
         </table>
       </div>
     </div>
+
+    <div class="admin-card">
+      <div class="card-title">🍩 Gràfics de distribució de la mostra</div>
+      <div class="charts-grid">
+        <div class="chart-card">
+          <div class="chart-inner-title">⚧ Sexe biològic</div>
+          <div class="chart-wrap"><canvas id="chart-ov-sex"></canvas></div>
+        </div>
+        <div class="chart-card">
+          <div class="chart-inner-title">🏳️‍🌈 Identitat de gènere</div>
+          <div class="chart-wrap"><canvas id="chart-ov-gender"></canvas></div>
+        </div>
+        <div class="chart-card">
+          <div class="chart-inner-title">🎭 Gènere percebut</div>
+          <div class="chart-wrap"><canvas id="chart-ov-perceived"></canvas></div>
+        </div>
+      </div>
+    </div>
   `;
+  makeDonut('chart-ov-sex', SEX_OPTS, SEX_OPTS.map(o=>sexCounts[o]||0), SEX_OPTS.map(o=>SEX_COLORS[o]||'#c4b5fd'));
+  makeDonut('chart-ov-gender', GENDER_OPTS, GENDER_OPTS.map(o=>gCounts[o]||0), GENDER_OPTS.map(o=>SEX_COLORS[o]||'#c4b5fd'));
+  makeDonut('chart-ov-perceived', PERCEIVED_OPTS, PERCEIVED_OPTS.map(o=>pCounts[o]||0), PERCEIVED_OPTS.map(o=>PERCEIVED_COLORS[o]||'#c4b5fd'));
 }
 
 // ════════════════════════════════════════════════════════
@@ -1237,6 +1374,36 @@ function renderEmotions(ps) {
     </div>
 
     <div class="admin-card">
+      <div class="card-title">🍩 Gràfics d'emocions per situació (formatget)</div>
+      <p style="font-size:13px;color:var(--clr-muted);margin-bottom:16px;">
+        Proporció de cada emoció atribuïda pels participants per a cadascun dels 6 personatges.
+      </p>
+      <div class="charts-grid">
+        ${SITUATIONS.map(sit => `
+          <div class="chart-card">
+            <div class="chart-inner-title">${sit.label} (${sit.charGender})</div>
+            <div class="chart-wrap"><canvas id="chart-donut-${sit.id}"></canvas></div>
+          </div>
+        `).join('')}
+      </div>
+    </div>
+
+    <div class="admin-card">
+      <div class="card-title">📊 Gràfics de barres: Gènere percebut × Emoció per situació</div>
+      <p style="font-size:13px;color:var(--clr-muted);margin-bottom:16px;">
+        Compara quantes persones de cada expressió de gènere han atribuït cada emoció per a cadascun dels 6 personatges.
+      </p>
+      ${SITUATIONS.map(sit => `
+        <div style="margin-bottom:28px;">
+          <div style="font-weight:600;font-size:13px;color:var(--clr-primary);margin-bottom:8px;">
+            ${sit.label} — Personatge ${sit.charGender}
+          </div>
+          <div class="chart-wrap-md"><canvas id="chart-bar-${sit.id}"></canvas></div>
+        </div>
+      `).join('')}
+    </div>
+
+    <div class="admin-card">
       <div class="card-title">🔗 Gènere percebut (conductes/interessos) ↔ Emocions atribuïdes</div>
       <p style="font-size:13px;color:var(--clr-muted);margin-bottom:16px;">
         Compara com responen els participants amb <strong>Expressió Masculina</strong> vs <strong>Expressió Femenina</strong> davant de cada situació.
@@ -1244,6 +1411,35 @@ function renderEmotions(ps) {
       ${perceivedCrossHTML}
     </div>
   `;
+
+  // Crear gràfics per cada situació
+  SITUATIONS.forEach(sit => {
+    // Donut: distribució d'emocions global
+    const emoCounts = {};
+    ps.forEach(p => {
+      const e = getEmotion(sit.id, p.answers ? p.answers[sit.id] : '');
+      emoCounts[e] = (emoCounts[e] || 0) + 1;
+    });
+    const emoLabels = Object.keys(emoCounts).sort((a,b) => emoCounts[b]-emoCounts[a]);
+    makeDonut(
+      'chart-donut-' + sit.id,
+      emoLabels,
+      emoLabels.map(e => emoCounts[e]),
+      emoLabels.map(e => emoColor(e))
+    );
+
+    // Barres agrupades: gènere percebut × emoció
+    const allEmos = Array.from(new Set(Object.values(SITUATION_EMOTIONS[sit.id])));
+    const datasets = PERCEIVED_OPTS.map((grp, idx) => {
+      const sub = ps.filter(p => perceivedKey(p) === grp);
+      return {
+        label: grp,
+        data: allEmos.map(emo => sub.filter(p => p.answers && getEmotion(sit.id, p.answers[sit.id]) === emo).length),
+        backgroundColor: PERCEIVED_COLORS[grp] || GROUP_PALETTE[idx]
+      };
+    });
+    makeBarGrouped('chart-bar-' + sit.id, allEmos, datasets);
+  });
 }
 
 // ════════════════════════════════════════════════════════
