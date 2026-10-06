@@ -584,8 +584,7 @@
 
       <div class="tabs" id="admin-tabs">
         <button class="tab-btn active" onclick="showTab('overview',this)">Visió general</button>
-        <button class="tab-btn" onclick="showTab('emotions',this)">🎯 Anàlisi Emocional & Gènere</button>
-        <button class="tab-btn" onclick="showTab('traits',this)">Conductes i interessos</button>
+        <button class="tab-btn" onclick="showTab('emotions',this)">🎯 Anàlisi Emocional & Sexe</button>
         <button class="tab-btn" onclick="showTab('situations',this)">Situacions</button>
         <button class="tab-btn" onclick="showTab('cross',this)">Creuaments generals</button>
         <button class="tab-btn" onclick="showTab('stats',this)">Associacions estadístiques (χ²)</button>
@@ -594,7 +593,6 @@
 
       <div id="tab-overview"   class="tab-content"></div>
       <div id="tab-emotions"   class="tab-content" style="display:none"></div>
-      <div id="tab-traits"     class="tab-content" style="display:none"></div>
       <div id="tab-situations" class="tab-content" style="display:none"></div>
       <div id="tab-cross"      class="tab-content" style="display:none"></div>
       <div id="tab-stats"      class="tab-content" style="display:none"></div>
@@ -610,24 +608,6 @@ const ADMIN_PASSWORD = 'jessica2025';
 
 // ✅ ENLLAÇ DE GOOGLE APPS SCRIPT CONFIGURAT:
 const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwalW7KhwzYjiZdPqA69dvcragoY-znvhbB6mhYSRY0OwSM9x76wP44Gr2LEfKE9Jj8/exec"; 
-
-// ════════════════════════════════════════════════════════
-//  CLASSIFICACIÓ ESTEREOTÍPICA DE CONDUCTES I INTERESSOS
-// ════════════════════════════════════════════════════════
-const TRAIT_STEREOTYPES = {
-  'Fer esport fora de l\'escola': 'Masc',
-  'Anar al gimnàs': 'Masc',
-  'Ser competitiu/competitiva': 'Masc',
-  'Ser líder': 'Masc',
-  'Jugar a videojocs': 'Masc',
-  'Tenir confiança en un mateix': 'Masc',
-  'Ajudar els altres sense que t\'ho demanin': 'Fem',
-  'Voler dedicar-se a una professió de l\'àmbit de l\'educació': 'Fem',
-  'Voler dedicar-se a una professió de l\'àmbit sanitari': 'Fem',
-  'Ser comprensiu/comprensiva': 'Fem',
-  'Que t\'agradi cuinar': 'Fem',
-  'Que t\'agradi anar a la moda': 'Fem'
-};
 
 // ════════════════════════════════════════════════════════
 //  CODIFICACIÓ TEÒRICA D'EMOCIONS (Marc de M. Chóliz)
@@ -688,16 +668,6 @@ const QUESTIONS = [
   { id:'gender', type:'single', hasOther:true,
     text:'Amb quin gènere t\'identifiques?',
     options:['Femení','Masculí','Altre'] },
-  { id:'traits', type:'multi',  hasOther:false,
-    text:'Amb quines d\'aquestes afirmacions t\'identifiques?',
-    options:[
-      'Fer esport fora de l\'escola','Anar al gimnàs','Ser competitiu/competitiva',
-      'Ser líder','Jugar a videojocs','Tenir confiança en un mateix',
-      'Ajudar els altres sense que t\'ho demanin',
-      'Voler dedicar-se a una professió de l\'àmbit de l\'educació',
-      'Voler dedicar-se a una professió de l\'àmbit sanitari',
-      'Ser comprensiu/comprensiva','Que t\'agradi cuinar','Que t\'agradi anar a la moda'
-    ] },
   { id:'laia', type:'single', hasOther:false, targetGender:'Femení',
     text:'Avui, la millor amiga de la Laia, una noia de 14 anys, ha anunciat que es traslladarà a una altra ciutat a causa del treball del seu pare i que, a partir d\'ara, no es podran veure tan sovint. Què creus que ha fet la Laia davant d\'aquesta situació?',
     options:Object.keys(SITUATION_EMOTIONS.laia) },
@@ -720,15 +690,13 @@ const QUESTIONS = [
 
 const SEX_OPTS    = ['Masculí','Femení','Altre'];
 const GENDER_OPTS = ['Femení','Masculí','Altre'];
-const PERCEIVED_OPTS = ['Expressió masculina', 'Expressió femenina', 'Expressió neutra/mixta'];
-const TRAITS_OPTS = QUESTIONS[2].options;
 const SITUATIONS  = [
-  { id:'laia',  label:'Laia',  charGender:'Femení', text:'Situació de la Laia',  opts: QUESTIONS[3].options },
-  { id:'marc',  label:'Marc',  charGender:'Masculí', text:'Situació d\'en Marc',  opts: QUESTIONS[4].options },
-  { id:'julia', label:'Júlia', charGender:'Femení', text:'Situació de la Júlia', opts: QUESTIONS[5].options },
-  { id:'nil',   label:'Nil',   charGender:'Masculí', text:'Situació d\'en Nil',   opts: QUESTIONS[6].options },
-  { id:'carla', label:'Carla', charGender:'Femení', text:'Situació de la Carla', opts: QUESTIONS[7].options },
-  { id:'alex',  label:'Àlex',  charGender:'Masculí', text:'Situació de l\'Àlex',  opts: QUESTIONS[8].options }
+  { id:'laia',  label:'Laia',  charGender:'Femení', text:'Situació de la Laia',  opts: QUESTIONS[2].options },
+  { id:'marc',  label:'Marc',  charGender:'Masculí', text:'Situació d\'en Marc',  opts: QUESTIONS[3].options },
+  { id:'julia', label:'Júlia', charGender:'Femení', text:'Situació de la Júlia', opts: QUESTIONS[4].options },
+  { id:'nil',   label:'Nil',   charGender:'Masculí', text:'Situació d\'en Nil',   opts: QUESTIONS[5].options },
+  { id:'carla', label:'Carla', charGender:'Femení', text:'Situació de la Carla', opts: QUESTIONS[6].options },
+  { id:'alex',  label:'Àlex',  charGender:'Masculí', text:'Situació de l\'Àlex',  opts: QUESTIONS[7].options }
 ];
 
 // ════════════════════════════════════════════════════════
@@ -902,16 +870,15 @@ function finishExperience() {
   // 2. Enviar a Google Sheets si la URL està configurada
   if (GOOGLE_SCRIPT_URL && GOOGLE_SCRIPT_URL.startsWith('http')) {
     const pObj = { answers: { ...answers } };
-    const scores = getTraitScores(pObj);
     const payload = {
       code: participantCode,
       timestamp: new Date().toISOString(),
       sex: resolveVal(pObj, 'sex'),
       gender: resolveVal(pObj, 'gender'),
-      perceived_gender: scores.category,
-      masc_score: scores.masc,
-      fem_score: scores.fem,
-      traits: Array.isArray(answers.traits) ? answers.traits.join(' | ') : '',
+      perceived_gender: '',
+      masc_score: 0,
+      fem_score: 0,
+      traits: '',
       laia_resp: answers.laia || '',
       laia_emo: getEmotion('laia', answers.laia),
       marc_resp: answers.marc || '',
@@ -1064,23 +1031,6 @@ function sexKey(p)    { const v = resolveVal(p,'sex');    return v.startsWith('A
 function genderKey(p) { const v = resolveVal(p,'gender'); return v.startsWith('Altre') ? 'Altre' : v; }
 
 // Càlcul del Gènere Percebut (Expressió conductual)
-function getTraitScores(p) {
-  const traits = (p && p.answers && Array.isArray(p.answers.traits)) ? p.answers.traits : [];
-  let masc = 0, fem = 0;
-  traits.forEach(t => {
-    if (TRAIT_STEREOTYPES[t] === 'Masc') masc++;
-    if (TRAIT_STEREOTYPES[t] === 'Fem') fem++;
-  });
-  let category = 'Expressió neutra/mixta';
-  if (masc > fem) category = 'Expressió masculina';
-  else if (fem > masc) category = 'Expressió femenina';
-  return { masc, fem, category, total: traits.length };
-}
-
-function perceivedKey(p) {
-  return getTraitScores(p).category;
-}
-
 // Resolució d'emoció d'una resposta
 function getEmotion(sitId, answerText) {
   if (!answerText) return 'Sense resposta';
@@ -1119,7 +1069,7 @@ const EMOTION_COLORS = {
   'Sense resposta':     '#e5e7eb'
 };
 const SEX_COLORS      = { 'Masculí': '#3b82f6', 'Femení': '#ec4899', 'Altre': '#8b5cf6' };
-const PERCEIVED_COLORS= { 'Expressió masculina': '#3b82f6', 'Expressió femenina': '#ec4899', 'Expressió neutra/mixta': '#9ca3af' };
+const GENDER_COLORS   = { 'Femení': '#ec4899', 'Masculí': '#3b82f6', 'Altre': '#8b5cf6' };
 const GROUP_PALETTE   = ['#7c3aed','#06b6d4','#10b981','#f59e0b','#ef4444','#8b5cf6','#ec4899','#f97316'];
 
 function emoColor(e) { return EMOTION_COLORS[e] || '#c4b5fd'; }
@@ -1196,7 +1146,6 @@ function renderTab(name) {
   const ps = getParticipants();
   if (name === 'overview')   renderOverview(ps);
   if (name === 'emotions')   renderEmotions(ps);
-  if (name === 'traits')     renderTraits(ps);
   if (name === 'situations') renderSituations(ps);
   if (name === 'cross')      renderCross(ps);
   if (name === 'stats')      renderStats(ps);
@@ -1217,9 +1166,6 @@ function renderOverview(ps) {
   const gCounts = {}; GENDER_OPTS.forEach(o => gCounts[o] = 0);
   ps.forEach(p => { const k = genderKey(p); if (gCounts[k] !== undefined) gCounts[k]++; else gCounts['Altre']++; });
 
-  const pCounts = {}; PERCEIVED_OPTS.forEach(o => pCounts[o] = 0);
-  ps.forEach(p => { const k = perceivedKey(p); if (pCounts[k] !== undefined) pCounts[k]++; else pCounts['Expressió neutra/mixta']++; });
-
   el.innerHTML = `
     <div class="admin-card">
       <div class="card-title">📊 Resum general de la mostra</div>
@@ -1230,17 +1176,6 @@ function renderOverview(ps) {
         <div class="stat-box"><div class="stat-num">${gCounts['Femení']||0}</div><div class="stat-label">Identitat Femenina</div></div>
         <div class="stat-box"><div class="stat-num">${gCounts['Masculí']||0}</div><div class="stat-label">Identitat Masculina</div></div>
       </div>
-    </div>
-
-    <div class="admin-card">
-      <div class="card-title">🎭 Gènere percebut (expressió conductual estereotípica)</div>
-      <p style="font-size:13px;color:var(--clr-muted);margin-bottom:14px;">
-        Calculat automàticament a partir del balanç entre conductes i interessos tradicionalment associats a patrons masculins o femenins (Pregunta 3).
-      </p>
-      <table class="data-table">
-        <tr><th>Classificació</th><th>Participants</th><th>Distribució</th></tr>
-        ${PERCEIVED_OPTS.map(o => `<tr><td><strong>${o}</strong></td><td><strong>${pCounts[o]||0}</strong> participants <span class="n-badge">n=${total}</span> <em style="color:var(--clr-muted)">(${pct(pCounts[o]||0,total)})</em></td><td>${barHTML(pCounts[o]||0,total)}</td></tr>`).join('')}
-      </table>
     </div>
 
     <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:16px;">
@@ -1271,16 +1206,11 @@ function renderOverview(ps) {
           <div class="chart-inner-title">🏳️‍🌈 Identitat de gènere</div>
           <div class="chart-wrap"><canvas id="chart-ov-gender"></canvas></div>
         </div>
-        <div class="chart-card">
-          <div class="chart-inner-title">🎭 Gènere percebut</div>
-          <div class="chart-wrap"><canvas id="chart-ov-perceived"></canvas></div>
-        </div>
       </div>
     </div>
   `;
   makeDonut('chart-ov-sex', SEX_OPTS, SEX_OPTS.map(o=>sexCounts[o]||0), SEX_OPTS.map(o=>SEX_COLORS[o]||'#c4b5fd'));
-  makeDonut('chart-ov-gender', GENDER_OPTS, GENDER_OPTS.map(o=>gCounts[o]||0), GENDER_OPTS.map(o=>SEX_COLORS[o]||'#c4b5fd'));
-  makeDonut('chart-ov-perceived', PERCEIVED_OPTS, PERCEIVED_OPTS.map(o=>pCounts[o]||0), PERCEIVED_OPTS.map(o=>PERCEIVED_COLORS[o]||'#c4b5fd'));
+  makeDonut('chart-ov-gender', GENDER_OPTS, GENDER_OPTS.map(o=>gCounts[o]||0), GENDER_OPTS.map(o=>GENDER_COLORS[o]||'#c4b5fd'));
 }
 
 // ════════════════════════════════════════════════════════
@@ -1319,13 +1249,13 @@ function renderEmotions(ps) {
     `;
   });
 
-  let perceivedCrossHTML = '';
+  let sexCrossHTML = '';
   SITUATIONS.forEach(sit => {
     const allEmos = Array.from(new Set(Object.values(SITUATION_EMOTIONS[sit.id])));
     
     let tableRows = '';
-    PERCEIVED_OPTS.forEach(grp => {
-      const sub = ps.filter(p => perceivedKey(p) === grp);
+    SEX_OPTS.forEach(s => {
+      const sub = ps.filter(p => sexKey(p) === s);
       const rowCells = allEmos.map(emo => {
         const c = sub.filter(p => p.answers && getEmotion(sit.id, p.answers[sit.id]) === emo).length;
         return `<td>${c} <span class="n-badge">n=${sub.length}</span><br><em style="font-size:11px;color:var(--clr-muted)">(${pct(c, sub.length)})</em></td>`;
@@ -1333,13 +1263,13 @@ function renderEmotions(ps) {
 
       tableRows += `
         <tr>
-          <td class="row-header"><strong>${grp}</strong> (n=${sub.length})</td>
+          <td class="row-header"><strong>${s}</strong> (n=${sub.length})</td>
           ${rowCells}
         </tr>
       `;
     });
 
-    perceivedCrossHTML += `
+    sexCrossHTML += `
       <div style="margin-bottom:24px;">
         <div style="font-weight:600;font-size:14px;color:var(--clr-primary);margin-bottom:8px;">
           ${sit.text} (${sit.label} — Personatge ${sit.charGender})
@@ -1347,7 +1277,7 @@ function renderEmotions(ps) {
         <div style="overflow-x:auto">
           <table class="cross-table">
             <tr>
-              <th>Gènere percebut del participant ↓ / Emoció →</th>
+              <th>Sexe biològic del participant ↓ / Emoció →</th>
               ${allEmos.map(e => `<th><span class="emotion-tag">${e}</span></th>`).join('')}
             </tr>
             ${tableRows}
@@ -1360,7 +1290,7 @@ function renderEmotions(ps) {
   el.innerHTML = `
     <div class="insight-box">
       <strong>💡 Marc Teòric de Mariano Chóliz integrat:</strong><br>
-      Aquesta pantalla tradueix les reaccions conductuals observables escollides pels adolescents a les seves emocions bàsiques i mecanismes de regulació emocional (Ira expressada vs regulada/suprimida, Por vs Por regulada, Tristesa, Alegria, etc.). Permet contrastar si les noies i els nois atribueixen emocions diferents depenent de si el personatge és un noi o una noia, i de la seva pròpia identitat/expressió de gènere.
+      Aquesta pantalla tradueix les reaccions conductuals observables escollides pels adolescents a les seves emocions bàsiques i mecanismes de regulació emocional (Ira expressada vs regulada/suprimida, Por vs Por regulada, Tristesa, Alegria, etc.). Permet contrastar si les noies i els nois (sexe biològic i identitat de gènere) atribueixen emocions diferents depenent de si el personatge és un noi o una noia.
     </div>
 
     <div class="admin-card">
@@ -1391,7 +1321,7 @@ function renderEmotions(ps) {
     <div class="admin-card">
       <div class="card-title">⚧ Gràfics de barres: Sexe biològic × Emoció per situació</div>
       <p style="font-size:13px;color:var(--clr-muted);margin-bottom:16px;">
-        Compara com responen els participants de <strong>Sexe Masculí</strong> vs <strong>Sexe Femení</strong> (i Altre) davant de cadascun dels 6 personatges.
+        Compara com responen els participants de <strong>Sexe Masculí</strong> vs <strong>Sexe Femení</strong> davant de cadascun dels 6 personatges.
       </p>
       ${SITUATIONS.map(sit => `
         <div style="margin-bottom:28px;">
@@ -1404,26 +1334,11 @@ function renderEmotions(ps) {
     </div>
 
     <div class="admin-card">
-      <div class="card-title">📊 Gràfics de barres: Gènere percebut × Emoció per situació</div>
+      <div class="card-title">🔗 Taules creuades: Sexe biològic ↔ Emocions atribuïdes</div>
       <p style="font-size:13px;color:var(--clr-muted);margin-bottom:16px;">
-        Compara quantes persones de cada expressió de gènere han atribuït cada emoció per a cadascun dels 6 personatges.
+        Desglossament detallat del nombre i percentatge de respostes per cada sexe biològic.
       </p>
-      ${SITUATIONS.map(sit => `
-        <div style="margin-bottom:28px;">
-          <div style="font-weight:600;font-size:13px;color:var(--clr-primary);margin-bottom:8px;">
-            ${sit.label} — Personatge ${sit.charGender} (Gènere percebut)
-          </div>
-          <div class="chart-wrap-md"><canvas id="chart-bar-${sit.id}"></canvas></div>
-        </div>
-      `).join('')}
-    </div>
-
-    <div class="admin-card">
-      <div class="card-title">🔗 Gènere percebut (conductes/interessos) ↔ Emocions atribuïdes</div>
-      <p style="font-size:13px;color:var(--clr-muted);margin-bottom:16px;">
-        Compara com responen els participants amb <strong>Expressió Masculina</strong> vs <strong>Expressió Femenina</strong> davant de cada situació.
-      </p>
-      ${perceivedCrossHTML}
+      ${sexCrossHTML}
     </div>
   `;
 
@@ -1445,7 +1360,7 @@ function renderEmotions(ps) {
 
     const allEmos = Array.from(new Set(Object.values(SITUATION_EMOTIONS[sit.id])));
 
-    // 1. Barres agrupades: SEXE BIOLÒGIC × emoció
+    // Barres agrupades: SEXE BIOLÒGIC × emoció
     const sexDatasets = SEX_OPTS.map(s => {
       const sub = ps.filter(p => sexKey(p) === s);
       return {
@@ -1455,78 +1370,7 @@ function renderEmotions(ps) {
       };
     });
     makeBarGrouped('chart-sex-bar-' + sit.id, allEmos, sexDatasets);
-
-    // 2. Barres agrupades: GÈNERE PERCEBUT × emoció
-    const datasets = PERCEIVED_OPTS.map((grp, idx) => {
-      const sub = ps.filter(p => perceivedKey(p) === grp);
-      return {
-        label: grp + ' (n=' + sub.length + ')',
-        data: allEmos.map(emo => sub.filter(p => p.answers && getEmotion(sit.id, p.answers[sit.id]) === emo).length),
-        backgroundColor: PERCEIVED_COLORS[grp] || GROUP_PALETTE[idx]
-      };
-    });
-    makeBarGrouped('chart-bar-' + sit.id, allEmos, datasets);
   });
-}
-
-// ════════════════════════════════════════════════════════
-//  PESTANYA 3 — CONDUCTES I INTERESSOS
-// ════════════════════════════════════════════════════════
-function renderTraits(ps) {
-  const total = ps.length;
-  const el = document.getElementById('tab-traits');
-  if (total === 0) { el.innerHTML = `<div class="no-data">Sense dades.</div>`; return; }
-
-  const sexGroups = {}; SEX_OPTS.forEach(s => sexGroups[s] = ps.filter(p => sexKey(p) === s));
-  const genGroups = {}; GENDER_OPTS.forEach(g => genGroups[g] = ps.filter(p => genderKey(p) === g));
-
-  let rows = '';
-  TRAITS_OPTS.forEach(opt => {
-    const count = ps.filter(p => p.answers && Array.isArray(p.answers.traits) && p.answers.traits.includes(opt)).length;
-    const stype = TRAIT_STEREOTYPES[opt] === 'Masc' 
-      ? '<span style="color:#2563eb;font-weight:600;font-size:11px;background:#dbeafe;padding:2px 6px;border-radius:4px;">Estereotip Masc</span>'
-      : '<span style="color:#db2777;font-weight:600;font-size:11px;background:#fce7f3;padding:2px 6px;border-radius:4px;">Estereotip Fem</span>';
-
-    const bySex = SEX_OPTS.map(s => { 
-      const sg=sexGroups[s]; 
-      const c=sg.filter(p=>p.answers && Array.isArray(p.answers.traits)&&p.answers.traits.includes(opt)).length; 
-      return `${c} <span class="n-badge">n=${sg.length}</span> <em style="color:var(--clr-muted)">(${pct(c,sg.length)})</em>`; 
-    }).join(' / ');
-
-    const byGen = GENDER_OPTS.map(g => { 
-      const gg=genGroups[g]; 
-      const c=gg.filter(p=>p.answers && Array.isArray(p.answers.traits)&&p.answers.traits.includes(opt)).length; 
-      return `${c} <span class="n-badge">n=${gg.length}</span> <em style="color:var(--clr-muted)">(${pct(c,gg.length)})</em>`; 
-    }).join(' / ');
-
-    rows += `<tr>
-      <td>${opt}<br>${stype}</td>
-      <td><strong>${count}</strong> <span class="n-badge">n=${total}</span><br><em style="color:var(--clr-muted)">${pct(count,total)}</em></td>
-      <td>${barHTML(count,total)}</td>
-      <td style="font-size:12px">${bySex}</td>
-      <td style="font-size:12px">${byGen}</td>
-    </tr>`;
-  });
-
-  el.innerHTML = `
-    <div class="admin-card">
-      <div class="card-title">🧩 Conductes i interessos (pregunta 3, selecció múltiple)</div>
-      <p style="font-size:13px;color:var(--clr-muted);margin-bottom:16px;">
-        Mostra quines conductes seleccionen més els adolescents i com es distribueixen segons el sexe biològic i el gènere sentit.
-      </p>
-      <div style="overflow-x:auto">
-        <table class="data-table">
-          <tr>
-            <th>Afirmació</th>
-            <th>Total general</th>
-            <th>Distribució</th>
-            <th>Per sexe biològic (Masc / Fem / Altre)</th>
-            <th>Per identitat de gènere (Fem / Masc / Altre)</th>
-          </tr>
-          ${rows}
-        </table>
-      </div>
-    </div>`;
 }
 
 // ════════════════════════════════════════════════════════
@@ -1546,7 +1390,6 @@ function renderSituations(ps) {
 
   const sexGroups = {}; SEX_OPTS.forEach(s => sexGroups[s] = ps.filter(p => sexKey(p) === s));
   const genGroups = {}; GENDER_OPTS.forEach(g => genGroups[g] = ps.filter(p => genderKey(p) === g));
-  const pGroups   = {}; PERCEIVED_OPTS.forEach(o => pGroups[o] = ps.filter(p => perceivedKey(p) === o));
 
   let rows = '';
   sit.opts.forEach(opt => {
@@ -1565,12 +1408,6 @@ function renderSituations(ps) {
       return `${c} (${pct(c, gg.length)})`;
     }).join('<br>');
 
-    const byPer = PERCEIVED_OPTS.map(o => {
-      const pg = pGroups[o];
-      const c = pg.filter(p => p.answers && p.answers[sit.id] === opt).length;
-      return `${c} (${pct(c, pg.length)})`;
-    }).join('<br>');
-
     rows += `<tr>
       <td style="max-width:260px;line-height:1.4">
         ${opt}<br>
@@ -1580,7 +1417,6 @@ function renderSituations(ps) {
       <td>${barHTML(count,total)}</td>
       <td style="font-size:12px;line-height:1.7">${bySex}</td>
       <td style="font-size:12px;line-height:1.7">${byGen}</td>
-      <td style="font-size:12px;line-height:1.7">${byPer}</td>
     </tr>`;
   });
 
@@ -1596,7 +1432,6 @@ function renderSituations(ps) {
             <th>Distribució</th>
             <th>Per sexe biològic<br><small style="opacity:.8">Masc / Fem / Altre</small></th>
             <th>Per identitat de gènere<br><small style="opacity:.8">Fem / Masc / Altre</small></th>
-            <th>Per gènere percebut<br><small style="opacity:.8">Masc / Fem / Neutre</small></th>
           </tr>
           ${rows}
         </table>
@@ -1665,22 +1500,9 @@ function renderCross(ps) {
     <td><strong>${total}</strong></td>
   </tr>`;
 
-  let crossRows2 = '';
-  SEX_OPTS.forEach(s => {
-    const sg = ps.filter(p => sexKey(p) === s);
-    crossRows2 += `<tr>
-      <td class="row-header">${s} (${sg.length})</td>
-      ${PERCEIVED_OPTS.map(o => {
-        const c = sg.filter(p => perceivedKey(p) === o).length;
-        return `<td><strong>${c}</strong> <span class="n-badge">n=${sg.length}</span><br><em style="color:var(--clr-muted);font-size:12px">${pct(c,sg.length)}</em></td>`;
-      }).join('')}
-      <td><strong>${sg.length}</strong></td>
-    </tr>`;
-  });
-
   el.innerHTML = `
     <div class="admin-card">
-      <div class="card-title">🔀 Creuament 1: Sexe biològic × Identitat de gènere</div>
+      <div class="card-title">🔀 Creuament: Sexe biològic × Identitat de gènere</div>
       <p style="font-size:13px;color:var(--clr-muted);margin-bottom:14px;">
         Indispensable per determinar concordança (cisgènere) o discordança (transgènere / no binari).
       </p>
@@ -1688,19 +1510,6 @@ function renderCross(ps) {
         <table class="cross-table">
           <tr><th>Sexe biològic ↓ / Identitat de gènere →</th>${GENDER_OPTS.map(g=>`<th>${g}</th>`).join('')}<th>Total</th></tr>
           ${crossRows1}
-        </table>
-      </div>
-    </div>
-
-    <div class="admin-card">
-      <div class="card-title">🔀 Creuament 2: Sexe biològic × Gènere percebut (conductes/interessos)</div>
-      <p style="font-size:13px;color:var(--clr-muted);margin-bottom:14px;">
-        Permet comprovar si el sexe biològic prediu realment les conductes tradicionalment estereotipades.
-      </p>
-      <div style="overflow-x:auto">
-        <table class="cross-table">
-          <tr><th>Sexe biològic ↓ / Gènere percebut →</th>${PERCEIVED_OPTS.map(o=>`<th>${o}</th>`).join('')}<th>Total</th></tr>
-          ${crossRows2}
         </table>
       </div>
     </div>
@@ -1747,21 +1556,21 @@ function renderStats(ps) {
     const cS = chiSquare(tS);
     const sS = cS.p!==null && parseFloat(cS.p)<.05;
 
-    const tP = PERCEIVED_OPTS.map(o => { const pg=ps.filter(p=>perceivedKey(p)===o); return emos.map(e => pg.filter(p=>p.answers && getEmotion(sit.id,p.answers[sit.id])===e).length); });
-    const cP = chiSquare(tP);
-    const sP = cP.p!==null && parseFloat(cP.p)<.05;
+    const tG = GENDER_OPTS.map(g => { const gg=ps.filter(p=>genderKey(p)===g); return emos.map(e => gg.filter(p=>p.answers && getEmotion(sit.id,p.answers[sit.id])===e).length); });
+    const cG = chiSquare(tG);
+    const sG = cG.p!==null && parseFloat(cG.p)<.05;
 
     html += `<div class="sub-section">
       <div class="sub-title">${sit.text} (${sit.label} — ${sit.charGender})</div>
       <div class="chi2-box ${sS?'':'insig'}">
         <div class="chi2-title">Sexe biològic ↔ Emoció a ${sit.label}</div>
         χ² = ${cS.chi2??'—'} &nbsp;|&nbsp; gl = ${cS.df??'—'} &nbsp;|&nbsp; ${pLabel(cS.p)}
-        <div class="chi2-note">${sS?'✅ <strong>Hi ha associació significativa:</strong> el sexe del participant condiciona l\'emoció atribuïda.':'⚠️ <strong>Sense associació significativa:</strong> no s\'observen patrons diferents per sexe biològic.'}</div>
+        <div class="chi2-note">${sS?'✅ <strong>Hi ha associació significativa:</strong> el sexe biològic del participant condiciona l\'emoció atribuïda.':'⚠️ <strong>Sense associació significativa:</strong> no s\'observen patrons diferents per sexe biològic.'}</div>
       </div>
-      <div class="chi2-box ${sP?'':'insig'}" style="margin-top:8px">
-        <div class="chi2-title">Gènere percebut (conductes) ↔ Emoció a ${sit.label}</div>
-        χ² = ${cP.chi2??'—'} &nbsp;|&nbsp; gl = ${cP.df??'—'} &nbsp;|&nbsp; ${pLabel(cP.p)}
-        <div class="chi2-note">${sP?'✅ <strong>Hi ha associació significativa:</strong> l\'expressió de gènere estereotípica condiciona l\'emoció atribuïda.':'⚠️ <strong>Sense associació significativa:</strong> no s\'observa patró diferencial estadístic.'}</div>
+      <div class="chi2-box ${sG?'':'insig'}" style="margin-top:8px">
+        <div class="chi2-title">Identitat de gènere ↔ Emoció a ${sit.label}</div>
+        χ² = ${cG.chi2??'—'} &nbsp;|&nbsp; gl = ${cG.df??'—'} &nbsp;|&nbsp; ${pLabel(cG.p)}
+        <div class="chi2-note">${sG?'✅ <strong>Hi ha associació significativa:</strong> la identitat de gènere condiciona l\'emoció atribuïda.':'⚠️ <strong>Sense associació significativa:</strong> no s\'observa patró diferencial estadístic per identitat de gènere.'}</div>
       </div>
     </div>`;
   });
@@ -1778,16 +1587,11 @@ function renderRaw(ps) {
   if (ps.length === 0) { el.innerHTML = `<div class="no-data">Sense dades.</div>`; return; }
 
   const rows = ps.map(p => {
-    const scores = getTraitScores(p);
     return `<tr>
       <td style="white-space:nowrap;font-size:12px"><strong>${p.code || '—'}</strong></td>
       <td style="font-size:12px">${p.timestamp ? new Date(p.timestamp).toLocaleString('ca') : '—'}</td>
       <td>${resolveVal(p,'sex')}</td>
       <td>${resolveVal(p,'gender')}</td>
-      <td>
-        <span class="emotion-tag">${scores.category}</span><br>
-        <small style="color:var(--clr-muted)">Masc: ${scores.masc} | Fem: ${scores.fem}</small>
-      </td>
       ${SITUATIONS.map(s => {
         const resp = (p.answers && p.answers[s.id]) || '—';
         const emo = getEmotion(s.id, resp);
@@ -1803,12 +1607,12 @@ function renderRaw(ps) {
     <div class="admin-card">
       <div class="card-title">📄 Registre individual complet (${ps.length} participants)</div>
       <p style="font-size:12px;color:var(--clr-muted);margin-bottom:14px;">
-        Inclou el codi anònim, timestamps, gènere percebut calculat i l'emoció associada a cada situació.
+        Inclou el codi anònim, data/hora, sexe biològic, identitat de gènere i l'emoció associada a cada situació.
       </p>
       <div style="overflow-x:auto">
         <table class="data-table" style="font-size:12px">
           <tr>
-            <th>Codi</th><th>Data/hora</th><th>Sexe biològic</th><th>Gènere sentit</th><th>Gènere percebut (conductes)</th>
+            <th>Codi</th><th>Data/hora</th><th>Sexe biològic</th><th>Identitat de gènere</th>
             ${SITUATIONS.map(s => `<th>${s.label} (${s.charGender})</th>`).join('')}
           </tr>
           ${rows}
@@ -1830,10 +1634,6 @@ function exportCSV() {
     'Timestamp',
     'Sexe_Biologic',
     'Identitat_Genere',
-    'Genere_Percebut',
-    'Punts_Masc',
-    'Punts_Fem',
-    'Conductes_Interessos',
     'Emocio_Laia', 'Resposta_Laia',
     'Emocio_Marc', 'Resposta_Marc',
     'Emocio_Julia', 'Resposta_Julia',
@@ -1843,17 +1643,12 @@ function exportCSV() {
   ];
 
   const rows = ps.map(p => {
-    const scores = getTraitScores(p);
     const ans = p.answers || {};
     return [
       esc(p.code),
       esc(p.timestamp || ''),
       esc(resolveVal(p,'sex')),
       esc(resolveVal(p,'gender')),
-      esc(scores.category),
-      scores.masc,
-      scores.fem,
-      esc(Array.isArray(ans.traits) ? ans.traits.join(' | ') : ''),
       esc(getEmotion('laia', ans['laia'])), esc(ans['laia']),
       esc(getEmotion('marc', ans['marc'])), esc(ans['marc']),
       esc(getEmotion('julia', ans['julia'])), esc(ans['julia']),
