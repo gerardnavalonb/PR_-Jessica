@@ -1109,6 +1109,46 @@ function makeBarGrouped(id, labels, datasets) {
   });
 }
 
+// Gràfic de barres agrupades en percentatge (%)
+function makeBarGroupedPct(id, labels, datasets) {
+  _destroyChart(id);
+  const ctx = document.getElementById(id);
+  if (!ctx) return;
+  _charts[id] = new Chart(ctx, {
+    type: 'bar',
+    data: { labels, datasets: datasets.map(d => ({ ...d, borderRadius: 4, borderSkipped: false })) },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: {
+        legend: { position: 'bottom', labels: { font: { size: 11 }, padding: 10, boxWidth: 12 } },
+        tooltip: {
+          callbacks: {
+            label: c => {
+              const count = (c.dataset.rawCounts && c.dataset.rawCounts[c.dataIndex] != null) ? c.dataset.rawCounts[c.dataIndex] : null;
+              const total = c.dataset.subTotal != null ? c.dataset.subTotal : null;
+              if (count !== null && total !== null) {
+                return ` ${c.dataset.label}: ${c.raw}% (${count} de ${total} participants)`;
+              }
+              return ` ${c.dataset.label}: ${c.raw}%`;
+            }
+          }
+        }
+      },
+      scales: {
+        x: { ticks: { font: { size: 10 } } },
+        y: {
+          beginAtZero: true,
+          max: 100,
+          ticks: {
+            stepSize: 20,
+            callback: v => v + ' %'
+          }
+        }
+      }
+    }
+  });
+}
+
 // Gràfic de barres horitzontals
 function makeBarH(id, labels, data, colors) {
   _destroyChart(id);
@@ -1319,14 +1359,14 @@ function renderEmotions(ps) {
     </div>
 
     <div class="admin-card">
-      <div class="card-title">⚧ Gràfics de barres: Sexe biològic × Emoció per situació</div>
+      <div class="card-title">⚧ Gràfics de barres: Sexe biològic × Emoció per situació (%)</div>
       <p style="font-size:13px;color:var(--clr-muted);margin-bottom:16px;">
-        Compara com responen els participants de <strong>Sexe Masculí</strong> vs <strong>Sexe Femení</strong> davant de cadascun dels 6 personatges.
+        Compara el percentatge de respostes dels participants de <strong>Sexe Masculí</strong> vs <strong>Sexe Femení</strong> davant de cadascun dels 6 personatges.
       </p>
       ${SITUATIONS.map(sit => `
         <div style="margin-bottom:28px;">
           <div style="font-weight:600;font-size:13px;color:var(--clr-primary);margin-bottom:8px;">
-            ${sit.label} — Personatge ${sit.charGender} (Sexe biològic)
+            ${sit.label} — Personatge ${sit.charGender} (Sexe biològic %)
           </div>
           <div class="chart-wrap-md"><canvas id="chart-sex-bar-${sit.id}"></canvas></div>
         </div>
@@ -1334,14 +1374,14 @@ function renderEmotions(ps) {
     </div>
 
     <div class="admin-card">
-      <div class="card-title">🏳️‍🌈 Gràfics de barres: Identitat de gènere × Emoció per situació</div>
+      <div class="card-title">🏳️‍🌈 Gràfics de barres: Identitat de gènere × Emoció per situació (%)</div>
       <p style="font-size:13px;color:var(--clr-muted);margin-bottom:16px;">
-        Compara com responen els participants segons la seva <strong>Identitat de gènere</strong> (Femení, Masculí, Altre) davant de cadascun dels 6 personatges.
+        Compara el percentatge de respostes dels participants segons la seva <strong>Identitat de gènere</strong> (Femení, Masculí, Altre) davant de cadascun dels 6 personatges.
       </p>
       ${SITUATIONS.map(sit => `
         <div style="margin-bottom:28px;">
           <div style="font-weight:600;font-size:13px;color:var(--clr-primary);margin-bottom:8px;">
-            ${sit.label} — Personatge ${sit.charGender} (Identitat de gènere)
+            ${sit.label} — Personatge ${sit.charGender} (Identitat de gènere %)
           </div>
           <div class="chart-wrap-md"><canvas id="chart-gender-bar-${sit.id}"></canvas></div>
         </div>
@@ -1375,27 +1415,35 @@ function renderEmotions(ps) {
 
     const allEmos = Array.from(new Set(Object.values(SITUATION_EMOTIONS[sit.id])));
 
-    // 1. Barres agrupades: SEXE BIOLÒGIC × emoció
+    // 1. Barres agrupades en %: SEXE BIOLÒGIC × emoció
     const sexDatasets = SEX_OPTS.map(s => {
       const sub = ps.filter(p => sexKey(p) === s);
+      const rawCounts = allEmos.map(emo => sub.filter(p => p.answers && getEmotion(sit.id, p.answers[sit.id]) === emo).length);
+      const pcts = rawCounts.map(c => sub.length ? Number(((c / sub.length) * 100).toFixed(1)) : 0);
       return {
         label: s + ' (n=' + sub.length + ')',
-        data: allEmos.map(emo => sub.filter(p => p.answers && getEmotion(sit.id, p.answers[sit.id]) === emo).length),
+        data: pcts,
+        rawCounts: rawCounts,
+        subTotal: sub.length,
         backgroundColor: SEX_COLORS[s] || '#8b5cf6'
       };
     });
-    makeBarGrouped('chart-sex-bar-' + sit.id, allEmos, sexDatasets);
+    makeBarGroupedPct('chart-sex-bar-' + sit.id, allEmos, sexDatasets);
 
-    // 2. Barres agrupades: IDENTITAT DE GÈNERE × emoció
+    // 2. Barres agrupades en %: IDENTITAT DE GÈNERE × emoció
     const genderDatasets = GENDER_OPTS.map(g => {
       const sub = ps.filter(p => genderKey(p) === g);
+      const rawCounts = allEmos.map(emo => sub.filter(p => p.answers && getEmotion(sit.id, p.answers[sit.id]) === emo).length);
+      const pcts = rawCounts.map(c => sub.length ? Number(((c / sub.length) * 100).toFixed(1)) : 0);
       return {
         label: g + ' (n=' + sub.length + ')',
-        data: allEmos.map(emo => sub.filter(p => p.answers && getEmotion(sit.id, p.answers[sit.id]) === emo).length),
+        data: pcts,
+        rawCounts: rawCounts,
+        subTotal: sub.length,
         backgroundColor: GENDER_COLORS[g] || '#8b5cf6'
       };
     });
-    makeBarGrouped('chart-gender-bar-' + sit.id, allEmos, genderDatasets);
+    makeBarGroupedPct('chart-gender-bar-' + sit.id, allEmos, genderDatasets);
   });
 }
 
@@ -1465,18 +1513,21 @@ function renderSituations(ps) {
     </div>
 
     <div class="admin-card">
-      <div class="card-title">📊 Gràfics comparatius per aquesta situació (${sit.label})</div>
+      <div class="card-title">📊 Gràfics comparatius en percentatge (%) per aquesta situació (${sit.label})</div>
+      <p style="font-size:13px;color:var(--clr-muted);margin-bottom:16px;">
+        Mostra el <strong>percentatge relatiu dins de cada grup</strong> per permetre una comparació directa i equitativa entre nois i noies, independentment de quants n'hi hagi de cadascun a la mostra.
+      </p>
       <div class="charts-grid">
         <div class="chart-card">
           <div class="chart-inner-title">🍩 Emocions atribuïdes (Global)</div>
           <div class="chart-wrap"><canvas id="chart-sit-donut"></canvas></div>
         </div>
         <div class="chart-card">
-          <div class="chart-inner-title">⚧ Comparativa per Sexe biològic</div>
+          <div class="chart-inner-title">⚧ Comparativa per Sexe biològic (%)</div>
           <div class="chart-wrap"><canvas id="chart-sit-sex"></canvas></div>
         </div>
         <div class="chart-card">
-          <div class="chart-inner-title">🏳️‍🌈 Comparativa per Identitat de gènere</div>
+          <div class="chart-inner-title">🏳️‍🌈 Comparativa per Identitat de gènere (%)</div>
           <div class="chart-wrap"><canvas id="chart-sit-gender"></canvas></div>
         </div>
       </div>
@@ -1489,27 +1540,35 @@ function renderSituations(ps) {
   const emoCounts = uniqueEmos.map(emo => ps.filter(p => p.answers && getEmotion(sit.id, p.answers[sit.id]) === emo).length);
   makeDonut('chart-sit-donut', uniqueEmos, emoCounts, uniqueEmos.map(e => emoColor(e)));
 
-  // Gràfic de barres per Sexe biològic
+  // Gràfic de barres en % per Sexe biològic
   const datasetsSex = SEX_OPTS.map(s => {
     const sub = ps.filter(p => sexKey(p) === s);
+    const rawCounts = uniqueEmos.map(emo => sub.filter(p => p.answers && getEmotion(sit.id, p.answers[sit.id]) === emo).length);
+    const pcts = rawCounts.map(c => sub.length ? Number(((c / sub.length) * 100).toFixed(1)) : 0);
     return {
       label: s + ' (n=' + sub.length + ')',
-      data: uniqueEmos.map(emo => sub.filter(p => p.answers && getEmotion(sit.id, p.answers[sit.id]) === emo).length),
+      data: pcts,
+      rawCounts: rawCounts,
+      subTotal: sub.length,
       backgroundColor: SEX_COLORS[s] || '#8b5cf6'
     };
   });
-  makeBarGrouped('chart-sit-sex', uniqueEmos, datasetsSex);
+  makeBarGroupedPct('chart-sit-sex', uniqueEmos, datasetsSex);
 
-  // Gràfic de barres per Identitat de gènere
+  // Gràfic de barres en % per Identitat de gènere
   const datasetsGender = GENDER_OPTS.map(g => {
     const sub = ps.filter(p => genderKey(p) === g);
+    const rawCounts = uniqueEmos.map(emo => sub.filter(p => p.answers && getEmotion(sit.id, p.answers[sit.id]) === emo).length);
+    const pcts = rawCounts.map(c => sub.length ? Number(((c / sub.length) * 100).toFixed(1)) : 0);
     return {
       label: g + ' (n=' + sub.length + ')',
-      data: uniqueEmos.map(emo => sub.filter(p => p.answers && getEmotion(sit.id, p.answers[sit.id]) === emo).length),
+      data: pcts,
+      rawCounts: rawCounts,
+      subTotal: sub.length,
       backgroundColor: GENDER_COLORS[g] || '#8b5cf6'
     };
   });
-  makeBarGrouped('chart-sit-gender', uniqueEmos, datasetsGender);
+  makeBarGroupedPct('chart-sit-gender', uniqueEmos, datasetsGender);
 }
 
 // ════════════════════════════════════════════════════════
